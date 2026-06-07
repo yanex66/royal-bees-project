@@ -1,0 +1,23 @@
+# .gitignore
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/         # Your virtual environment folder
+*.env         # Your .env file with secret keys
+.vscode/      # VS Code specific settings (optional, but good practice)
+
+# Django
+*.log
+*.pot
+*.mo
+db.sqlite3    # Your SQLite database file
+media/        # User-uploaded media files (if you manage them locally)
+staticfiles/  # Collected static files (these are generated, not source controlled)
+
+# Operating System files
+.DS_Store
+Thumbs.db

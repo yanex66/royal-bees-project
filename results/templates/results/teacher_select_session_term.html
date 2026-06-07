@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --pure-white: #ffffff;
+        --soft-bg: #fdfaf0;
+        --danger-red: #d32f2f;
+    }
+
+    .selection-panel {
+        background-color: var(--pure-white);
+        max-width: 650px;
+        margin: 40px auto;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        border: 1px solid #eee;
+    }
+
+    h1 {
+        color: var(--primary-green);
+        font-weight: 800;
+        font-size: 1.8rem;
+        border: none;
+        margin-bottom: 5px;
+    }
+
+    .step-indicator {
+        display: inline-block;
+        background: var(--main-cream);
+        color: var(--dark-green);
+        padding: 5px 15px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+
+    /* Student Identity Card */
+    .student-badge {
+        background: var(--soft-bg);
+        border-left: 5px solid var(--primary-green);
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    .student-badge i {
+        font-size: 2.5rem;
+        color: var(--primary-green);
+        margin-right: 20px;
+    }
+
+    .student-details p { margin: 0; line-height: 1.4; }
+    .student-details strong { color: var(--dark-green); font-size: 1.1rem; }
+
+    /* Form Elements */
+    .period-fieldset {
+        border: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .period-fieldset legend {
+        font-weight: 700;
+        color: #555;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 20px;
+    }
+
+    .form-group-custom {
+        margin-bottom: 25px;
+    }
+
+    .form-group-custom label {
+        display: block;
+        font-weight: 700;
+        color: #444;
+        margin-bottom: 8px;
+    }
+
+    select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #eee;
+        border-radius: 10px;
+        background-color: #fafafa;
+        font-family: 'Poppins', sans-serif;
+        transition: 0.3s;
+    }
+
+    select:focus {
+        border-color: var(--primary-green);
+        outline: none;
+        box-shadow: 0 0 8px rgba(20, 122, 70, 0.1);
+    }
+
+    .btn-proceed {
+        width: 100%;
+        background-color: var(--primary-green);
+        color: var(--white);
+        border: none;
+        padding: 16px;
+        border-radius: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(20, 122, 70, 0.2);
+    }
+
+    .btn-proceed:hover {
+        background-color: var(--dark-green);
+        transform: translateY(-2px);
+    }
+
+    .error-box {
+        background-color: #fee2e2;
+        color: var(--danger-red);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #fecaca;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .back-link {
+        display: block;
+        text-align: center;
+        margin-top: 25px;
+        color: #666;
+        text-decoration: none;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .back-link:hover {
+        color: var(--primary-green);
+        text-decoration: underline;
+    }
+</style>
+
+<div class="selection-panel animate__animated animate__fadeIn">
+    <div class="step-indicator">Step 1: Define Period</div>
+    <h1>Academic Period</h1>
+    <p class="text-muted mb-4">Select the session and term for score entry.</p>
+
+    {# Student Summary Badge #}
+    <div class="student-badge">
+        <i class="fas fa-user-circle"></i>
+        <div class="student-details">
+            <p><small class="text-muted">Target Student:</small></p>
+            <strong>{{ student.get_full_name }}</strong>
+            <p class="small">ID: {{ student.student_id }} | Class: {{ student.current_class.name|default:"N/A" }}</p>
+        </div>
+    </div>
+
+    {% if error_message %}
+        <div class="error-box animate__animated animate__shakeX">
+            <i class="fas fa-exclamation-circle mr-2"></i> {{ error_message }}
+        </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'results:teacher_select_session_term' student_id=student.id %}">
+        {% csrf_token %}
+        <fieldset class="period-fieldset">
+            <legend>Selection Criteria</legend>
+            
+            <div class="form-group-custom">
+                <label for="academic_session"><i class="fas fa-calendar-alt mr-2 text-success"></i>Academic Session</label>
+                <select name="academic_session" id="academic_session" required>
+                    <option value="">--- Choose Session ---</option>
+                    {% for session_item in sessions %}
+                        <option value="{{ session_item.id }}" {% if request.POST.academic_session == session_item.id|stringformat:"s" or request.method == "GET" and current_session and current_session.id == session_item.id %}selected{% endif %}>
+                            {{ session_item.year }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group-custom">
+                <label for="term"><i class="fas fa-clock mr-2 text-success"></i>Term</label>
+                <select name="term" id="term" required>
+                    <option value="">--- Choose Term ---</option>
+                    {% for term_item in terms %}
+                        <option value="{{ term_item.id }}" {% if request.POST.term == term_item.id|stringformat:"s" %}selected{% endif %}>
+                            {{ term_item.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-proceed">
+                Proceed to Score Sheet <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </fieldset>
+    </form>
+
+    <a href="{% url 'results:teacher_search_student' %}" class="back-link">
+        <i class="fas fa-long-arrow-alt-left mr-1"></i> Back to Student Search
+    </a>
+</div>
+{% endblock %}

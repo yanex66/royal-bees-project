@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block head_extra %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --dark-cream: #f0da81;
+        --white: #ffffff;
+        --shadow: 0 10px 30px rgba(0,0,0,0.08);
+        --transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* --- Header Styling --- */
+    .curriculum-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--main-cream);
+        padding: 60px 0;
+        border-radius: 0 0 50px 50px;
+        margin-bottom: 50px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .curriculum-header h1 {
+        color: var(--white) !important;
+        font-weight: 800;
+        letter-spacing: 1px;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+    }
+
+    .section-title {
+        color: var(--primary-green);
+        font-weight: 800;
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 10px;
+        display: inline-block;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 60px;
+        height: 4px;
+        background-color: var(--dark-cream);
+        border-radius: 2px;
+    }
+
+    /* --- Intro Box --- */
+    .intro-box {
+        background-color: var(--white);
+        border-top: 5px solid var(--primary-green);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        margin-bottom: 60px;
+        text-align: center;
+    }
+
+    .intro-box p {
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #444;
+        margin-bottom: 0;
+    }
+
+    /* --- Educational Progression Cards --- */
+    .level-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border-left: 6px solid var(--primary-green);
+        display: flex;
+        align-items: flex-start;
+        transition: var(--transition);
+    }
+
+    .level-card:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 25px rgba(20, 122, 70, 0.15);
+        border-left-color: var(--dark-cream);
+    }
+
+    .level-icon {
+        background-color: rgba(20, 122, 70, 0.1);
+        color: var(--primary-green);
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin-right: 25px;
+        flex-shrink: 0;
+        transition: var(--transition);
+    }
+
+    .level-card:hover .level-icon {
+        background-color: var(--primary-green);
+        color: var(--white);
+    }
+
+    .level-content h3 {
+        color: var(--dark-green);
+        font-weight: 800;
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+    }
+
+    .level-content p {
+        color: #666;
+        margin-bottom: 0;
+        line-height: 1.6;
+    }
+
+    /* --- Subject Areas Grid --- */
+    .subjects-container {
+        background-color: rgba(249, 232, 162, 0.3);
+        padding: 60px 0;
+        border-radius: 30px;
+        margin-bottom: 60px;
+    }
+
+    .subject-card {
+        background: var(--white);
+        padding: 30px 20px;
+        border-radius: 15px;
+        text-align: center;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        border-bottom: 4px solid transparent;
+        transition: var(--transition);
+    }
+
+    .subject-card:hover {
+        transform: translateY(-8px);
+        border-bottom-color: var(--primary-green);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    }
+
+    .subject-icon {
+        font-size: 2.5rem;
+        color: var(--dark-green);
+        margin-bottom: 20px;
+    }
+
+    .subject-card h5 {
+        color: var(--primary-green);
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .subject-card p {
+        font-size: 0.9rem;
+        color: #666;
+        margin-bottom: 0;
+    }
+
+    /* --- Mobile Adjustments --- */
+    @media (max-width: 768px) {
+        .curriculum-header { padding: 40px 0; border-radius: 0 0 30px 30px; }
+        .intro-box { padding: 25px; }
+        .level-card { flex-direction: column; text-align: center; padding: 25px; align-items: center; border-left: none; border-top: 6px solid var(--primary-green); }
+        .level-card:hover { transform: translateY(-5px); border-top-color: var(--dark-cream); }
+        .level-icon { margin-right: 0; margin-bottom: 20px; }
+        .subjects-container { padding: 40px 15px; border-radius: 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <section class="curriculum-header animate__animated animate__fadeInDown">
+        <div class="container">
+            <h1>{{ page_title }}</h1>
+            <p class="lead mt-3" style="max-width: 800px; margin: 0 auto;">A broad, balanced, and globally competitive academic framework.</p>
+        </div>
+    </section>
+
+    <div class="container">
+        
+        <section class="animate__animated animate__fadeInUp">
+            <div class="intro-box">
+                <p>
+                    <strong>ROYAL BEES SCHOOLS</strong> offers a comprehensive curriculum based on the Nigerian National Policy on Education, enriched with international best practices to provide a globally competitive education. Our curriculum is designed to be broad, balanced, and highly relevant to the evolving needs of our students.
+                </p>
+            </div>
+        </section>
+
+        <section class="animate__animated animate__fadeInUp animate__delay-1s">
+            <div class="text-center mb-5">
+                <h2 class="section-title" style="margin: 0 auto;">Educational Progression</h2>
+                <p class="text-muted mt-3">Tailored learning stages designed for optimal student development.</p>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    
+                    <div class="level-card">
+                        <div class="level-icon"><i class="fas fa-baby-carriage"></i></div>
+                        <div class="level-content">
+                            <h3>Creche & Pre-Nursery</h3>
+                            <p>A safe, loving environment focused on early childhood development, sensory exploration, and interactive play-based learning.</p>
+                        </div>
+                    </div>
+
+                    <div class="level-card">
+                        <div class="level-icon"><i class="fas fa-shapes"></i></div>
+                        <div class="level-content">
+                            <h3>Nursery (KG Classes)</h3>
+                            <p>Laying the foundation for academic success with an engaging focus on Numeracy, Literacy, Phonics, Creative Arts, and positive Social Habits.</p>
+                        </div>
+                    </div>
+
+                    <div class="level-card">
+                        <div class="level-icon"><i class="fas fa-child"></i></div>
+                        <div class="level-content">
+                            <h3>Primary (Basic 1 - 6)</h3>
+                            <p>A robust foundational stage covering core subjects including English Studies, Mathematics, Basic Science & Technology (BST), National Values Education (NVE), Pre-Vocational Studies (PVS), Cultural & Creative Arts (CCA), French, and Nigerian Languages.</p>
+                        </div>
+                    </div>
+
+                    <div class="level-card">
+                        <div class="level-icon"><i class="fas fa-school"></i></div>
+                        <div class="level-content">
+                            <h3>Junior Secondary (JSS 1-3 / Basic 7-9)</h3>
+                            <p>Building upon primary education by introducing a wider, more specialized range of subjects, thoroughly preparing students for the Basic Education Certificate Examination (BECE).</p>
+                        </div>
+                    </div>
+
+                    <div class="level-card">
+                        <div class="level-icon"><i class="fas fa-user-graduate"></i></div>
+                        <div class="level-content">
+                            <h3>Senior Secondary (SSS 1-3)</h3>
+                            <p>Advanced specialization in Science, Arts, or Commercial pathways. Rigorous preparation for WASSCE, NECO SSCE, and vital international examinations to ensure university readiness.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="subjects-container animate__animated animate__fadeInUp">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="section-title" style="margin: 0 auto;">Core Subject Areas</h2>
+                    <p class="text-muted mt-3">While specific subjects vary by level and stream, our core academic pillars include:</p>
+                </div>
+
+                <div class="row g-4 justify-content-center">
+                    
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="subject-card">
+                            <i class="fas fa-book-reader subject-icon"></i>
+                            <h5>English & Literature</h5>
+                            <p>English Language, Literature-in-English, Phonics, and Diction.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="subject-card">
+                            <i class="fas fa-square-root-alt subject-icon"></i>
+                            <h5>Mathematics</h5>
+                            <p>Core Mathematics, Further Mathematics, and Quantitative Reasoning.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="subject-card">
+                            <i class="fas fa-flask subject-icon"></i>
+                            <h5>The Sciences</h5>
+                            <p>Physics, Chemistry, Biology, Basic Science, and Agricultural Science.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="subject-card">
+                            <i class="fas fa-language subject-icon"></i>
+                            <h5>Languages</h5>
+                            <p>French, Yoruba, Igbo, Hausa, and advanced communication skills.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="subject-card">
+                            <i class="fas fa-globe-africa subject-icon"></i>
+                            <h5>Humanities</h5>
+                            <p>Government, History, Geography, Economics, and Civic Education.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="subject-card">
+                            <i class="fas fa-laptop-code subject-icon"></i>
+                            <h5>Technology</h5>
+                            <p>Basic Technology, ICT/Computer Studies, and Technical Drawing.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="subject-card">
+                            <i class="fas fa-briefcase subject-icon"></i>
+                            <h5>Vocational & Arts</h5>
+                            <p>Business Studies, Accounting, Home Economics, and Visual Arts.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}

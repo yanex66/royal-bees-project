@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Report Sheet - {{ student.get_full_name }}{% endblock %}
+
+{% block content %}
+    <style>
+        :root {
+            --primary-green: #147a46;
+            --dark-green: #0d5c34;
+            --main-cream: #f9e8a2;
+            --dark-cream: #f0da81;
+            --white: #ffffff;
+            --radius-md: 15px;
+        }
+
+        .portal-bg {
+            background-color: #fffdf5;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* --- Sidebar Motivation (Consistency) --- */
+        .motivation-sidebar {
+            position: fixed;
+            top: 200px;
+            width: 180px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            border: 2px solid var(--dark-cream);
+            text-align: center;
+            z-index: 5;
+        }
+        .sidebar-left { left: 30px; }
+        .sidebar-right { right: 30px; }
+
+        /* --- Report Header --- */
+        .report-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            color: var(--main-cream);
+            padding: 40px 20px;
+            border-radius: 0 0 30px 30px;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .student-info-card {
+            background: var(--white);
+            max-width: 900px;
+            margin: -60px auto 40px;
+            padding: 25px;
+            border-radius: var(--radius-md);
+            border: 2px solid var(--dark-cream);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .info-item { text-align: center; padding: 10px; }
+        .info-item label { display: block; font-size: 0.8rem; color: #777; text-transform: uppercase; font-weight: bold; }
+        .info-item span { font-size: 1.1rem; font-weight: 700; color: var(--primary-green); }
+
+        /* --- Table Styling --- */
+        .table-container {
+            background: var(--white);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th {
+            background-color: var(--primary-green);
+            color: var(--main-cream);
+            padding: 15px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .results-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .subject-col { text-align: left !important; font-weight: 700 !important; color: #333; }
+
+        /* --- Grade Badges --- */
+        .badge-grade {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: 800;
+            color: white;
+        }
+        .grade-A { background-color: #2e7d32; }
+        .grade-B { background-color: #4caf50; }
+        .grade-C { background-color: #ffa000; }
+        .grade-F { background-color: #d32f2f; }
+
+        .btn-another {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background: var(--primary-green);
+            color: var(--main-cream) !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-another:hover { background: var(--dark-green); transform: translateY(-2px); }
+
+        @media (max-width: 1200px) { .motivation-sidebar { display: none; } }
+        @media print { .motivation-sidebar, .btn-another, footer { display: none !important; } }
+    </style>
+
+    <div class="portal-bg">
+        
+        <div class="motivation-sidebar sidebar-left animate__animated animate__fadeInLeft">
+            <div class="motivation-item">
+                <i class="fas fa-medal" style="font-size: 1.5rem; color: var(--primary-green);"></i>
+                <p style="font-size: 0.8rem; margin-top: 10px;">"Success is the sum of small efforts repeated day in and day out."</p>
+            </div>
+        </div>
+
+        <div class="motivation-sidebar sidebar-right animate__animated animate__fadeInRight">
+            <div class="motivation-item">
+                <i class="fas fa-graduation-cap" style="font-size: 1.5rem; color: var(--primary-green);"></i>
+                <p style="font-size: 0.8rem; margin-top: 10px;">"The beautiful thing about learning is that no one can take it away from you."</p>
+            </div>
+        </div>
+
+        <div class="report-header">
+            <h1 style="border:none; color: var(--main-cream)!important;">Official Termly Report</h1>
+            <p>Royal Bees Schools Academic Assessment Record</p>
+        </div>
+
+        <div class="student-info-card animate__animated animate__fadeInUp">
+            <div class="info-item">
+                <label>Student Name</label>
+                <span>{{ student.get_full_name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Admission No</label>
+                <span>{{ student.student_id }}</span>
+            </div>
+            <div class="info-item">
+                <label>Class</label>
+                <span>{{ student.current_class.name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Period</label>
+                <span>{% if academic_session %}{{ academic_session.year }} - {{ current_term.name }}{% else %}N/A{% endif %}</span>
+            </div>
+        </div>
+
+        <div class="container table-container animate__animated animate__fadeIn">
+            {% if results %}
+                <div class="table-responsive">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th class="subject-col">Subject</th>
+                                <th>CA 1 (20)</th>
+                                <th>CA 2 (20)</th>
+                                <th>Exam (60)</th>
+                                <th>Total (100)</th>
+                                <th>Grade</th>
+                                <th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                                <tr>
+                                    <td class="subject-col">{{ result.subject.name }}</td>
+                                    <td>{{ result.test_score_1|default:"-" }}</td>
+                                    <td>{{ result.test_score_2|default:"-" }}</td>
+                                    <td>{{ result.exam_score|default:"-" }}</td>
+                                    <td style="color: var(--primary-green); font-weight: bold;">{{ result.total_score|default:"-" }}</td>
+                                    <td>
+                                        <span class="badge-grade grade-{{ result.grade|slice:':1'|default:'F' }}">
+                                            {{ result.grade|default:"-" }}
+                                        </span>
+                                    </td>
+                                    <td style="font-size: 0.85rem; color: #666;">{{ result.remarks|default:"Satisfactory" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                    <p class="lead">No results found for this session or term yet.</p>
+                </div>
+            {% endif %}
+
+            <div class="text-center">
+                <a href="{% url 'results:check_results' %}" class="btn-another">
+                    <i class="fas fa-search mr-2"></i> Check Another Result
+                </a>
+                <button onclick="window.print()" class="btn btn-outline-success ml-3 mt-4 mt-sm-0" style="border-radius: 8px; padding: 11px 20px;">
+                    <i class="fas fa-print mr-2"></i> Print Report
+                </button>
+            </div>
+        </div>
+
+        <div style="height: 50px;"></div>
+    </div>
+{% endblock %}

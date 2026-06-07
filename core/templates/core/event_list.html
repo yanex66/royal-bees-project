@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title|default:"Events" }} - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block head_extra %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --dark-cream: #f0da81;
+        --white: #ffffff;
+        --text-muted: #6c757d;
+    }
+
+    .events-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--main-cream);
+        padding: 60px 0;
+        border-radius: 0 0 50px 50px;
+        margin-bottom: 50px;
+        text-align: center;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .events-header h1 {
+        color: var(--white) !important;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .section-title {
+        color: var(--primary-green);
+        font-weight: 800;
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 10px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 60px;
+        height: 4px;
+        background-color: var(--dark-cream);
+        border-radius: 2px;
+    }
+
+    /* Event Card Styling */
+    .event-card {
+        background: var(--white);
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .event-date-box {
+        background-color: var(--primary-green);
+        color: var(--white);
+        text-align: center;
+        padding: 20px 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 120px;
+    }
+
+    .event-date-box .month {
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--main-cream);
+    }
+
+    .event-date-box .day {
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1;
+        margin: 5px 0;
+    }
+
+    .event-date-box .year {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .event-details {
+        padding: 25px;
+        flex-grow: 1;
+    }
+
+    .event-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--dark-green);
+        margin-bottom: 15px;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .event-title:hover {
+        color: var(--primary-green);
+        text-decoration: none;
+    }
+
+    .event-meta {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 15px;
+    }
+
+    .event-meta i {
+        color: var(--primary-green);
+        width: 20px;
+        text-align: center;
+        margin-right: 5px;
+    }
+
+    .event-desc {
+        color: #444;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+
+    .btn-read-more {
+        display: inline-block;
+        padding: 8px 20px;
+        background-color: var(--main-cream);
+        color: var(--dark-green);
+        font-weight: 600;
+        border-radius: 20px;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .btn-read-more:hover {
+        background-color: var(--primary-green);
+        color: var(--white);
+        text-decoration: none;
+    }
+
+    /* Past Events Styling */
+    .past-events-section {
+        background-color: #f8f9fa;
+        padding: 50px 0;
+        border-radius: 20px;
+        margin-top: 60px;
+    }
+
+    .past-event-item {
+        background: var(--white);
+        border-left: 4px solid var(--text-muted);
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        border-radius: 0 10px 10px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .past-event-title {
+        color: #333;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+    }
+    
+    .past-event-title:hover {
+        color: var(--primary-green);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        background: var(--white);
+        border-radius: 15px;
+        border: 2px dashed #ddd;
+    }
+
+    @media (min-width: 768px) {
+        .event-card {
+            flex-direction: row;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="events-header animate__animated animate__fadeInDown">
+    <div class="container">
+        <h1>{{ page_title|default:"School Events" }}</h1>
+        <p class="lead mt-3" style="max-width: 700px; margin: 0 auto;">Stay updated with the latest activities, academic schedules, and celebrations at Royal Bees Schools.</p>
+    </div>
+</header>
+
+<div class="container">
+    {% if upcoming_events %}
+        <h2 class="section-title animate__animated animate__fadeInLeft">Upcoming Events</h2>
+        
+        <div class="row">
+            <div class="col-12">
+                {% for event in upcoming_events %}
+                    <div class="event-card animate__animated animate__fadeInUp">
+                        
+                        <div class="event-date-box">
+                            <span class="month">{{ event.start_datetime|date:"M" }}</span>
+                            <span class="day">{{ event.start_datetime|date:"d" }}</span>
+                            <span class="year">{{ event.start_datetime|date:"Y" }}</span>
+                        </div>
+                        
+                        <div class="event-details">
+                            <a href="{% url 'event_detail' year=event.start_datetime.year month=event.start_datetime.month|stringformat:'02d' day=event.start_datetime.day|stringformat:'02d' slug=event.slug %}" class="event-title d-block">
+                                {{ event.title }}
+                            </a>
+                            
+                            <div class="event-meta">
+                                <div class="mb-1">
+                                    <i class="far fa-clock"></i> 
+                                    {{ event.start_datetime|date:"l, F j, Y \a\t P" }}
+                                    {% if event.end_datetime %}
+                                        <br><span class="ml-4 pl-1">to {{ event.end_datetime|date:"l, F j, Y \a\t P" }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if event.location %}
+                                    <div>
+                                        <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {% if event.description %}
+                                <p class="event-desc">{{ event.description|striptags|truncatewords:30 }}</p>
+                            {% endif %}
+                            
+                            <a href="{% url 'event_detail' year=event.start_datetime.year month=event.start_datetime.month|stringformat:'02d' day=event.start_datetime.day|stringformat:'02d' slug=event.slug %}" class="btn-read-more">
+                                View Details <i class="fas fa-arrow-right ml-1" style="font-size: 0.8em;"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="empty-state animate__animated animate__fadeIn">
+            <i class="far fa-calendar-alt mb-3" style="font-size: 3rem; color: var(--dark-cream);"></i>
+            <h3 style="color: var(--primary-green);">No Upcoming Events</h3>
+            <p class="text-muted">There are no events scheduled at the moment. Please check back soon for updates!</p>
+        </div>
+    {% endif %}
+
+    {% if past_events %}
+        <div class="past-events-section px-4 animate__animated animate__fadeInUp">
+            <h2 class="section-title" style="margin-bottom: 25px;">Recent Past Events</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    {% for event in past_events|slice:":5" %}
+                        <div class="past-event-item">
+                            <a href="{% url 'event_detail' year=event.start_datetime.year month=event.start_datetime.month|stringformat:'02d' day=event.start_datetime.day|stringformat:'02d' slug=event.slug %}" class="past-event-title d-block mb-1">
+                                {{ event.title }}
+                            </a>
+                            <div class="text-muted small">
+                                <i class="far fa-calendar-alt mr-1"></i> {{ event.start_datetime|date:"M d, Y" }}
+                                {% if event.location %}
+                                    <span class="mx-2">|</span> <i class="fas fa-map-marker-alt mr-1"></i> {{ event.location }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

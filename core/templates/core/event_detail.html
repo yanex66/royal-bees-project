@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.title }} - Events - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block head_extra %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --dark-cream: #f0da81;
+        --white: #ffffff;
+        --text-muted: #6c757d;
+    }
+
+    .event-detail-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--main-cream);
+        padding: 70px 0 90px 0;
+        border-radius: 0 0 50px 50px;
+        margin-bottom: -50px; /* Pulls the card up over the header */
+        text-align: center;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .event-detail-header h1 {
+        color: var(--white) !important;
+        font-weight: 800;
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+    }
+
+    .event-detail-card {
+        background: var(--white);
+        border: none;
+        border-radius: 20px;
+        border-top: 6px solid var(--primary-green);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 10;
+        margin-bottom: 50px;
+        overflow: hidden;
+    }
+
+    .event-meta-section {
+        background-color: rgba(20, 122, 70, 0.04);
+        padding: 30px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .meta-icon {
+        background-color: var(--main-cream);
+        color: var(--dark-green);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    .meta-text h5 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .meta-text p {
+        margin: 0;
+        font-weight: 600;
+        color: var(--dark-green);
+        font-size: 1.1rem;
+    }
+
+    .event-description-body {
+        padding: 40px;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #333;
+    }
+
+    .btn-back {
+        background-color: var(--white);
+        color: var(--primary-green);
+        border: 2px solid var(--primary-green);
+        font-weight: bold;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-back:hover {
+        background-color: var(--primary-green);
+        color: var(--white);
+        text-decoration: none;
+        transform: translateX(-5px);
+    }
+
+    @media (max-width: 768px) {
+        .event-detail-header { padding: 50px 15px 80px 15px; }
+        .event-detail-header h1 { font-size: 2rem; }
+        .event-description-body { padding: 25px 20px; }
+        .event-meta-section { padding: 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="event-article">
+    
+    <header class="event-detail-header animate__animated animate__fadeInDown">
+        <div class="container">
+            <span class="badge badge-warning mb-3 px-3 py-2" style="font-size: 0.9rem; background-color: var(--main-cream); color: var(--dark-green);">Event Details</span>
+            <h1>{{ event.title }}</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card event-detail-card animate__animated animate__fadeInUp">
+                    
+                    <div class="event-meta-section">
+                        <div class="row">
+                            <div class="col-md-6 mb-3 mb-md-4">
+                                <div class="meta-item">
+                                    <div class="meta-icon">
+                                        <i class="far fa-calendar-check"></i>
+                                    </div>
+                                    <div class="meta-text">
+                                        <h5>Start Time</h5>
+                                        <p>{{ event.start_datetime|date:"l, F d, Y" }}</p>
+                                        <p style="font-size: 0.95rem; font-weight: normal; color: var(--text-muted);">{{ event.start_datetime|date:"P" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if event.end_datetime %}
+                            <div class="col-md-6 mb-3 mb-md-4">
+                                <div class="meta-item">
+                                    <div class="meta-icon" style="background-color: #e9ecef; color: var(--text-muted);">
+                                        <i class="far fa-calendar-times"></i>
+                                    </div>
+                                    <div class="meta-text">
+                                        <h5>End Time</h5>
+                                        <p>{{ event.end_datetime|date:"l, F d, Y" }}</p>
+                                        <p style="font-size: 0.95rem; font-weight: normal; color: var(--text-muted);">{{ event.end_datetime|date:"P" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if event.location %}
+                            <div class="col-md-12 mt-md-2">
+                                <div class="meta-item">
+                                    <div class="meta-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="meta-text">
+                                        <h5>Location</h5>
+                                        <p>{{ event.location }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="event-description-body">
+                        <h4 class="mb-4" style="color: var(--primary-green); font-weight: 700;">About This Event</h4>
+                        
+                        {% if event.description %}
+                            <div class="description-text text-justify">
+                                {{ event.description|linebreaksbr }}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="far fa-file-alt mb-3" style="font-size: 3rem; color: var(--dark-cream);"></i>
+                                <p class="text-muted mb-0">No further details are available for this event at the moment.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="text-center mb-5 pb-4 animate__animated animate__fadeIn">
+                    <a href="{% url 'event_list' %}" class="btn-back shadow-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Events List
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock %}

@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ news_item.title }} - News - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block head_extra %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --dark-cream: #f0da81;
+        --white: #ffffff;
+        --text-muted: #6c757d;
+    }
+
+    .news-detail-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--main-cream);
+        padding: 70px 0 90px 0;
+        border-radius: 0 0 50px 50px;
+        margin-bottom: -50px; /* Pulls the card up over the header */
+        text-align: center;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 1;
+    }
+
+    .news-detail-header h1 {
+        color: var(--white) !important;
+        font-weight: 800;
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+        line-height: 1.3;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .news-detail-card {
+        background: var(--white);
+        border: none;
+        border-radius: 20px;
+        border-top: 6px solid var(--primary-green);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 10;
+        margin-bottom: 50px;
+        overflow: hidden;
+    }
+
+    .news-meta-section {
+        background-color: rgba(20, 122, 70, 0.04);
+        padding: 20px 40px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .meta-icon {
+        background-color: var(--main-cream);
+        color: var(--dark-green);
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-size: 1rem;
+    }
+
+    .news-content-body {
+        padding: 40px;
+        font-size: 1.15rem;
+        line-height: 1.8;
+        color: #333;
+    }
+
+    /* Styles for content that might be inside the news text */
+    .news-content-body p {
+        margin-bottom: 1.5rem;
+    }
+
+    .news-content-body blockquote {
+        border-left: 5px solid var(--main-cream);
+        padding-left: 20px;
+        font-style: italic;
+        color: #555;
+        background-color: #fafafa;
+        padding: 15px 20px;
+        border-radius: 0 10px 10px 0;
+    }
+
+    .btn-back {
+        background-color: var(--white);
+        color: var(--primary-green);
+        border: 2px solid var(--primary-green);
+        font-weight: bold;
+        padding: 10px 25px;
+        border-radius: 30px;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-back:hover {
+        background-color: var(--primary-green);
+        color: var(--white);
+        text-decoration: none;
+        transform: translateX(-5px);
+    }
+
+    .share-section {
+        padding: 20px 40px;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .share-text {
+        font-weight: 700;
+        color: var(--dark-green);
+        margin: 0;
+    }
+
+    .share-btn {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: var(--white);
+        margin-left: 10px;
+        transition: transform 0.3s;
+        text-decoration: none;
+    }
+
+    .share-btn:hover {
+        transform: translateY(-3px);
+        color: var(--white);
+        text-decoration: none;
+    }
+
+    .btn-whatsapp { background-color: #25D366; }
+    .btn-facebook { background-color: #1877F2; }
+
+    @media (max-width: 768px) {
+        .news-detail-header { padding: 50px 15px 80px 15px; }
+        .news-detail-header h1 { font-size: 1.8rem; }
+        .news-content-body { padding: 25px 20px; font-size: 1.05rem; }
+        .news-meta-section { padding: 20px; flex-direction: column; align-items: flex-start; gap: 10px; }
+        .share-section { flex-direction: column; gap: 15px; text-align: center; padding: 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="news-article">
+    
+    <header class="news-detail-header animate__animated animate__fadeInDown">
+        <div class="container">
+            <span class="badge badge-warning mb-3 px-3 py-2" style="font-size: 0.9rem; background-color: var(--main-cream); color: var(--dark-green);">News & Announcements</span>
+            <h1>{{ news_item.title }}</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card news-detail-card animate__animated animate__fadeInUp">
+                    
+                    <div class="news-meta-section">
+                        <div class="meta-item">
+                            <div class="meta-icon">
+                                <i class="far fa-calendar-alt"></i>
+                            </div>
+                            <span>{{ news_item.published_date|date:"l, F d, Y, P" }}</span>
+                        </div>
+                        
+                        {% if news_item.author %}
+                        <div class="meta-item">
+                            <div class="meta-icon" style="background-color: #e9ecef;">
+                                <i class="far fa-user"></i>
+                            </div>
+                            <span>By {{ news_item.author.get_full_name|default:news_item.author.username }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="news-content-body">
+                        {{ news_item.content|linebreaksbr }}
+                    </div>
+                    
+                    <div class="share-section">
+                        <p class="share-text"><i class="fas fa-share-alt mr-2"></i> Share this update:</p>
+                        <div>
+                            <a href="https://api.whatsapp.com/send?text={{ request.build_absolute_uri }}" target="_blank" class="share-btn btn-whatsapp" title="Share on WhatsApp">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="share-btn btn-facebook" title="Share on Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="text-center mb-5 pb-4 animate__animated animate__fadeIn">
+                    <a href="{% url 'news_list' %}" class="btn-back shadow-sm">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to News List
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock %}

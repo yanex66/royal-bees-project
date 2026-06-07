@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; text-align: center; border: 1px solid #ddd; padding: 30px; border-radius: 10px;">
+    <h2 style="color: #28a745;">Payment Successful!</h2>
+    <p>Thank you for your payment to <strong>ROYAL BEES INTERNATIONAL SCHOOLS LTD</strong>.</p>
+    <hr>
+    <div style="text-align: left; background: #f9f9f9; padding: 20px; border-radius: 5px;">
+        <p><strong>Student:</strong> {{ payment.student_name }}</p>
+        <p><strong>Admission No:</strong> {{ payment.admission_number }}</p>
+        <p><strong>Amount:</strong> ₦{{ payment.amount }}</p>
+        <p><strong>Reference:</strong> {{ payment.paystack_reference }}</p>
+        <p><strong>Date:</strong> {{ payment.created_at|date:"M d, Y H:i" }}</p>
+    </div>
+    <br>
+    <a href="{% url 'results:check_result' %}" class="btn btn-primary">Check Student Result</a>
+</div>
+{% endblock %}

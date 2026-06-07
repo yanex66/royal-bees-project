@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact Us - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block head_extra %}
+<style>
+    :root {
+        --school-green: #147a46;
+        --school-green-dark: #0d5c34;
+        --school-cream: #f9e8a2;
+        --light-bg: #f8f9fa;
+        --white: #ffffff;
+        --shadow-lg: 0 15px 35px rgba(0,0,0,0.1);
+    }
+
+    body {
+        background-color: var(--school-cream);
+    }
+
+    .contact-page-wrapper {
+        padding: 60px 15px;
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .contact-container {
+        background: var(--white);
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        max-width: 1000px;
+        width: 100%;
+    }
+
+    /* --- Green Info Card Styling --- */
+    .contact-info-card {
+        background-color: var(--school-green);
+        color: var(--school-cream);
+        padding: 50px 40px;
+        height: 100%;
+        border-radius: 30px;
+        transform: scale(1.02);
+        box-shadow: 10px 0 30px rgba(20, 122, 70, 0.3);
+        position: relative;
+        z-index: 2;
+    }
+
+    .info-header {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 30px;
+        color: var(--school-cream);
+        border-bottom: 1px solid rgba(249, 232, 162, 0.3);
+        padding-bottom: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 30px;
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(249, 232, 162, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+    .info-text-block {
+        font-size: 0.95rem;
+        font-weight: 600;
+        line-height: 1.6;
+    }
+
+    .info-text-block h6 {
+        color: var(--white);
+        font-weight: 800;
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+    .annex-badge {
+        background-color: var(--school-cream);
+        color: var(--school-green-dark);
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 3px 10px;
+        border-radius: 12px;
+        display: inline-block;
+        margin: 15px 0 5px 0;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* --- Form Area Styling --- */
+    .contact-form-area {
+        padding: 50px 40px;
+        background: var(--white);
+    }
+
+    .form-header-main {
+        color: var(--school-green);
+        font-weight: 800;
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .form-subheader {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 40px;
+    }
+
+    .form-section-title {
+        color: var(--school-green);
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 25px;
+    }
+
+    .custom-input {
+        background-color: var(--light-bg);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 15px 20px;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #333;
+        transition: all 0.3s ease;
+    }
+
+    .custom-input:focus {
+        background-color: var(--white);
+        border-color: var(--school-green);
+        box-shadow: 0 0 0 0.2rem rgba(20, 122, 70, 0.1);
+        outline: none;
+    }
+
+    .input-label {
+        font-weight: 700;
+        color: #444;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .btn-submit {
+        background-color: var(--school-green);
+        color: var(--school-cream);
+        font-weight: 700;
+        padding: 15px 30px;
+        border-radius: 12px;
+        border: none;
+        width: 100%;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+        background-color: var(--school-green-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(20, 122, 70, 0.2);
+    }
+
+    @media (max-width: 991px) {
+        .contact-info-card {
+            border-radius: 30px 30px 0 0;
+            transform: scale(1);
+            box-shadow: none;
+            padding: 40px 25px;
+        }
+        .contact-form-area {
+            padding: 40px 25px;
+            border-radius: 0 0 30px 30px;
+        }
+        .form-header-main { font-size: 2.2rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="contact-page-wrapper animate__animated animate__fadeIn">
+    <div class="contact-container">
+        <div class="row g-0">
+            
+            <div class="col-lg-7 order-lg-2">
+                <div class="contact-form-area">
+                    <h1 class="form-header-main">Get in Touch</h1>
+                    <p class="form-subheader">Contact our administrative office for enquiries and admissions.</p>
+
+                    <h3 class="form-section-title">Send a Message</h3>
+                    
+                    <form method="POST" action="{% url 'contact_us' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-4">
+                            <label class="input-label">Your Name</label>
+                            <input type="text" name="name" class="form-control custom-input" required>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="input-label">Email Address</label>
+                            <input type="email" name="email" class="form-control custom-input" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="input-label">Message</label>
+                            <textarea name="message" class="form-control custom-input" rows="4" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            Send Message <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-5 order-lg-1">
+                <div class="contact-info-card">
+                    <h2 class="info-header">Contact Details</h2>
+                    
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="info-text-block">
+                            <h6>Phone Lines:</h6>
+                            <div>0803 373 1141</div>
+                            <div>0803 714 9253</div>
+                            
+                            <div class="annex-badge">ANNEX LINE</div>
+                            <div>0704 466 9406</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="info-text-block">
+                            <h6>Main School:</h6>
+                            <div>Irepodun Street, After Sammy Hotel, Imala Elega, Abeokuta, Ogun State.</div>
+                            
+                            <div class="annex-badge">ANNEX SCHOOL</div>
+                            <div>Behind Simon Taiwo Ibajesomo Memorial Anglican Church, Agba Akin (Oosa) Jesu, Akere Off Bode Olude, Abeokuta.</div>
+                        </div>
+                    </div>
+
+                    <div class="info-item mb-0">
+                        <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="info-text-block">
+                            <h6>Email Addresses:</h6>
+                            <div><a href="mailto:royalbeess@gmail.com" style="color: inherit; text-decoration: none;">royalbeess@gmail.com</a></div>
+                            <div class="mt-1"><a href="mailto:help.royalbees@gmail.com" style="color: inherit; text-decoration: none;">help.royalbees@gmail.com</a></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
