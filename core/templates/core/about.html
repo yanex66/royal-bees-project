@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Us - ROYAL BEES INTERNATIONAL SCHOOL{% endblock %}
+
+{% block head_extra %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --dark-cream: #f0da81;
+        --white: #ffffff;
+        --shadow: 0 10px 30px rgba(0,0,0,0.08);
+        --transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* --- Header Styling --- */
+    .about-header {
+        background: linear-gradient(rgba(20, 122, 70, 0.4), rgba(13, 92, 52, 0.6)), 
+                    url("{% static 'core/images/teampics/schl.jpg' %}") center/cover no-repeat;
+        color: var(--main-cream);
+        padding: 100px 0; 
+        border-radius: 0 0 50px 50px;
+        margin-bottom: 50px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .about-header h1 {
+        color: var(--white) !important;
+        font-weight: 800;
+        letter-spacing: 2px;
+        font-size: clamp(2.2rem, 6vw, 4rem);
+        text-shadow: 2px 2px 15px rgba(0,0,0,0.6);
+        text-transform: uppercase;
+    }
+
+    .reg-badge {
+        background-color: var(--white);
+        border: 2px solid var(--primary-green);
+        color: var(--primary-green);
+        display: inline-block;
+        padding: 6px 25px;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 0.95rem;
+        margin-top: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* --- Section Titles --- */
+    .section-title {
+        color: var(--primary-green);
+        font-weight: 800;
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 12px;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+        width: 80px;
+        height: 5px;
+        background-color: var(--dark-cream);
+        border-radius: 5px;
+    }
+
+    .title-left::after { left: 0; transform: none; }
+
+    /* --- Core Values Section --- */
+    .value-box {
+        background: var(--white);
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: var(--shadow);
+        text-align: center;
+        border-bottom: 5px solid var(--dark-cream);
+        transition: var(--transition);
+        height: 100%;
+    }
+
+    .value-box:hover {
+        transform: translateY(-8px);
+        border-bottom-color: var(--primary-green);
+    }
+
+    .value-icon {
+        font-size: 2.5rem;
+        color: var(--primary-green);
+        margin-bottom: 15px;
+    }
+
+    /* --- Feature List --- */
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .feature-icon {
+        background: var(--primary-green);
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+        font-size: 0.9rem;
+    }
+
+    /* --- Leadership Cards --- */
+    .leader-card {
+        background: var(--white);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+        text-align: center;
+        height: 100%;
+        border-bottom: 5px solid var(--primary-green);
+    }
+
+    .leader-img-wrapper {
+        width: 160px;
+        height: 160px;
+        margin: 35px auto 20px;
+        border-radius: 50%;
+        padding: 5px;
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-cream));
+    }
+
+    .leader-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid var(--white);
+    }
+
+    .leader-quote {
+        font-style: italic;
+        color: #666;
+        font-size: 0.95rem;
+        position: relative;
+        padding: 0 15px;
+    }
+
+    /* --- Call to Action --- */
+    .cta-section {
+        background: var(--primary-green);
+        color: white;
+        padding: 60px 0;
+        border-radius: 30px;
+        margin: 60px 0;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <section class="about-header animate__animated animate__fadeIn">
+        <div class="container">
+            <h1>Royal Bees <br>International School</h1>
+            <div class="reg-badge">RC: 8467930</div>
+            <p class="lead mt-3" style="font-weight: 500; color: white; text-shadow: 1px 1px 5px rgba(0,0,0,0.3);">
+                Nurturing Today's Child for Tomorrow's Leadership.
+            </p>
+        </div>
+    </section>
+
+    <div class="container">
+        
+        <section class="mb-5 pb-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6 animate__animated animate__fadeInLeft">
+                    <h2 class="section-title title-left">Our Identity</h2>
+                    <p class="lead" style="color: var(--dark-green); font-weight: 600;">
+                        A premier center for academic excellence and character development.
+                    </p>
+                    <p class="text-muted" style="line-height: 1.8;">
+                        Royal Bees International School is fully incorporated under the Companies and Allied Matters Act 2020. 
+                        We operate with a clear mandate to provide world-class Nursery and Primary education from our head office at 
+                        <strong>Irepodun Street, After Sammy Hotel, Imala Elega, Abeokuta, Ogun State</strong>.
+                    </p>
+                    <p class="text-muted" style="line-height: 1.8;">
+                        We believe every child possesses unique talents. Our goal is to discover and equip them with the essential skills 
+                        to thrive and lead in an ever-evolving global society.
+                    </p>
+                </div>
+                <div class="col-lg-6 text-center animate__animated animate__fadeInRight">
+                    <div class="position-relative d-inline-block">
+                        <img src="{% static 'core/images/Rimages/WhatsApp Image 2025-06-03 at 08.26.34_e29fb873.jpg' %}" alt="Students" class="img-fluid rounded-lg shadow-lg border" style="border-width: 8px !important; border-color: var(--white) !important;">
+                        <div class="bg-success text-white p-3 rounded shadow position-absolute" style="bottom: -20px; right: 20px;">
+                            <strong>TIN: 33162066-0001</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5 pb-5 text-center">
+            <h2 class="section-title">Our Core Values</h2>
+            <div class="row g-4 mt-2">
+                <div class="col-md-4 mb-4">
+                    <div class="value-box">
+                        <i class="fas fa-star value-icon"></i>
+                        <h4>Excellence</h4>
+                        <p class="text-muted">We strive for the highest standards in academics and conduct.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="value-box">
+                        <i class="fas fa-shield-alt value-icon"></i>
+                        <h4>Integrity</h4>
+                        <p class="text-muted">Building upright character is at the heart of everything we do.</p>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="value-box">
+                        <i class="fas fa-chart-line value-icon"></i>
+                        <h4>Growth</h4>
+                        <p class="text-muted">We foster a recognized center for continuous holistic development.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5 pb-5">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="bg-white p-5 rounded-lg shadow-sm border-top border-success h-100 transition-hover">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-light text-success rounded-circle p-3 mr-3"><i class="fas fa-bullseye fa-2x"></i></div>
+                            <h3 class="m-0 font-weight-bold">Our Mission</h3>
+                        </div>
+                        <p class="text-muted" style="font-size: 1.1rem; line-height: 1.7;">
+                            To build future leaders of upright character by providing quality education that nurtures excellence, 
+                            moral values, and personal fulfillment.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="bg-white p-5 rounded-lg shadow-sm border-top border-success h-100">
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="bg-light text-success rounded-circle p-3 mr-3"><i class="fas fa-eye fa-2x"></i></div>
+                            <h3 class="m-0 font-weight-bold">Our Vision</h3>
+                        </div>
+                        <p class="text-muted" style="font-size: 1.1rem; line-height: 1.7;">
+                            To raise a generation of responsible global leaders distinguished by integrity, equipped 
+                            to transform their communities through holistic learning.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5 pb-5">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <img src="{% static 'core/images/teampics/schl.jpg' %}" class="img-fluid rounded shadow" alt="School Environment">
+                </div>
+                <div class="col-md-6 pl-md-5">
+                    <h2 class="section-title title-left mt-4 mt-md-0">Why Royal Bees?</h2>
+                    <div class="feature-list mt-3">
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-check"></i></div>
+                            <div><strong>Holistic Growth:</strong> A center recognized for developing the whole child.</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-check"></i></div>
+                            <div><strong>Moral Integrity:</strong> Prioritizing upright character alongside academic success.</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-check"></i></div>
+                            <div><strong>Safe Environment:</strong> A secure and conducive hive for your "bees" to thrive.</div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"><i class="fas fa-check"></i></div>
+                            <div><strong>Expert Staff:</strong> Dedicated educators committed to the Royal Bees vision.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5 pb-5 text-center">
+            <h2 class="section-title">Meet Our Leadership</h2>
+            <p class="text-muted mb-5">The visionaries steering the hive toward a brighter future.</p>
+            <div class="row justify-content-center">
+                <div class="col-md-5 mb-4">
+                    <div class="leader-card">
+                        <div class="leader-img-wrapper">
+                            <img src="{% static 'core/images/teampics/PROPpics.jpeg' %}" alt="Proprietress" class="leader-img">
+                        </div>
+                        <div class="leader-info">
+                            <h4 class="font-weight-bold text-dark">Mrs. Adejoke Ashani Ibajesomo</h4>
+                            <p class="text-success font-weight-bold">Proprietress / Managing Director</p>
+                            <p class="leader-quote">"Shaping minds, building character, and committed to holistic growth."</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 mb-4">
+                    <div class="leader-card">
+                        <div class="leader-img-wrapper">
+                            <img src="{% static 'core/images/teampics/HMpics.jpeg' %}" alt="Head Mistress" class="leader-img">
+                        </div>
+                        <div class="leader-info">
+                            <h4 class="font-weight-bold text-dark">Mrs. Oyewo Oluwakorede Abidemi</h4>
+                            <p class="text-success font-weight-bold">Head Mistress</p>
+                            <p class="leader-quote">"Equipping young people to lead with integrity."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-5 pb-5 text-center">
+            <h2 class="section-title">Get In Touch</h2>
+            <div class="mt-4 p-4 rounded-lg shadow-sm bg-white border" style="border-top: 5px solid var(--primary-green) !important;">
+                <div class="row justify-content-center">
+                    <div class="col-md-5 mb-3 mb-md-0">
+                        <p class="mb-0 h5">
+                            <i class="fas fa-envelope mr-2 text-success"></i>
+                            <strong>Official Email:</strong> <br>
+                            <a href="mailto:royalbeess@gmail.com" class="text-success">royalbeess@gmail.com</a>
+                        </p>
+                    </div>
+                    <div class="col-md-5">
+                        <p class="mb-0 h5">
+                            <i class="fas fa-envelope mr-2 text-success"></i>
+                            <strong>Support Email:</strong> <br>
+                            <a href="mailto:help.royalbees@gmail.com" class="text-success">help.royalbees@gmail.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section animate__animated animate__pulse animate__infinite">
+            <div class="container">
+                <h2 class="font-weight-bold">Ready to Join the Hive?</h2>
+                <p class="lead">Enroll your child at Royal Bees International School today.</p>
+                <a href="{% url 'admissions' %}" class="btn btn-light btn-lg px-5 mt-3 shadow" style="color: var(--primary-green); font-weight: 800;">Get Started</a>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}

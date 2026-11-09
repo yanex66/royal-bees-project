@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admissions - ROYAL BEES INTERNATIONAL SCHOOL{% endblock %}
+
+{% block head_extra %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --dark-cream: #f0da81;
+        --white: #ffffff;
+    }
+
+    /* --- Responsive Header --- */
+    .admissions-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--main-cream);
+        padding: clamp(40px, 8vw, 80px) 0;
+        border-radius: 0 0 30px 30px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .admissions-header h1 {
+        color: var(--white) !important;
+        font-weight: 900;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .section-title {
+        color: var(--primary-green);
+        font-weight: 800;
+        margin-bottom: 25px;
+        position: relative;
+        padding-bottom: 12px;
+        font-size: clamp(1.4rem, 3vw, 1.8rem);
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 50px;
+        height: 5px;
+        background-color: var(--dark-cream);
+        border-radius: 5px;
+    }
+
+    /* --- Process List --- */
+    .process-list {
+        padding-left: 0;
+        list-style: none;
+        counter-reset: admissions-counter;
+    }
+
+    .process-list li {
+        position: relative;
+        padding-left: 60px;
+        margin-bottom: 25px;
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+
+    .process-list li::before {
+        counter-increment: admissions-counter;
+        content: counter(admissions-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 40px;
+        height: 40px;
+        background-color: var(--primary-green);
+        color: var(--white);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        box-shadow: 0 4px 10px rgba(20, 122, 70, 0.3);
+    }
+
+    /* --- Form Styling --- */
+    .custom-card {
+        border: none;
+        border-radius: 25px;
+        border-top: 8px solid var(--primary-green);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 1.5px solid #eee;
+        transition: 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.2rem rgba(20, 122, 70, 0.1);
+    }
+
+    .btn-submit {
+        background: linear-gradient(to right, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        font-weight: 800;
+        border: none;
+        padding: 15px;
+        border-radius: 12px;
+        transition: 0.4s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(20, 122, 70, 0.3);
+        color: white;
+    }
+
+    /* --- Responsive Contact Cards --- */
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .contact-card {
+        border-radius: 20px;
+        color: var(--white);
+        padding: 35px 25px;
+        transition: 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .main-school-card { background: var(--primary-green); }
+    .annex-school-card { background: var(--dark-green); }
+
+    .contact-icon {
+        color: rgba(255, 255, 255, 0.2);
+        font-size: 5rem;
+        position: absolute;
+        right: -10px;
+        bottom: -10px;
+    }
+
+    .contact-card h4 {
+        color: var(--main-cream);
+        font-weight: 800;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .contact-card a {
+        color: var(--white);
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 1.1rem;
+    }
+
+    .contact-card a:hover {
+        color: var(--main-cream);
+    }
+
+    @media (max-width: 768px) {
+        .process-list li { font-size: 0.95rem; }
+        .custom-card { padding: 15px !important; }
+        .admissions-header { border-radius: 0 0 20px 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="admissions-header text-center animate__animated animate__fadeIn">
+    <div class="container">
+        <h1>Admissions</h1>
+        <p class="lead mt-3 mx-auto" style="max-width: 800px; color: var(--white); opacity: 0.9;">
+            Building character and excellence. Join a nurturing environment where your child is destined to be a leader.
+        </p>
+    </div>
+</section>
+
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-lg-5 mb-5 animate__animated animate__fadeInLeft">
+            <h2 class="section-title">The Path to the Hive</h2>
+            <ol class="process-list">
+                <li><strong>Obtain Form:</strong> Available at our admin offices or start with the online form here.</li>
+                <li><strong>Submission:</strong> Submit completed forms with required documentation to the office.</li>
+                <li><strong>Assessment:</strong> Students will undergo an age-appropriate interview or assessment.</li>
+                <li><strong>Offer:</strong> Successful candidates receive an official offer of admission.</li>
+                <li><strong>Acceptance:</strong> Confirm your spot by making fee payments within the stipulated period.</li>
+            </ol>
+
+            <div class="p-4 rounded-lg mt-5 shadow-sm" style="background: var(--white); border-left: 5px solid var(--primary-green);">
+                <h4 class="font-weight-bold mb-3" style="color: var(--primary-green);">Required Documents</h4>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="fas fa-file-alt mr-2 text-success"></i> Birth Certificate (Photocopy)</li>
+                    <li class="mb-2"><i class="fas fa-camera mr-2 text-success"></i> 2 Recent Passport Photographs</li>
+                    <li class="mb-2"><i class="fas fa-graduation-cap mr-2 text-success"></i> Last Academic Report</li>
+                    <li class="mb-2"><i class="fas fa-check-circle mr-2 text-success"></i> Medical Records (If applicable)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-7 mb-5 animate__animated animate__fadeInRight">
+            <div class="card custom-card p-4">
+                <div class="card-body">
+                    <h2 class="section-title">Online Inquiry Form</h2>
+                    <p class="text-muted mb-4">Start your child's journey today. Fill the form below and we'll reach out.</p>
+                    
+                    <form method="post" action=".">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="font-weight-bold"><i class="fas fa-child mr-2"></i>Full Name of Applicant</label>
+                            <input type="text" class="form-control" name="applicant_name" placeholder="Surname First" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="font-weight-bold"><i class="fas fa-calendar-day mr-2"></i>Date of Birth</label>
+                                <input type="date" class="form-control" name="date_of_birth" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="font-weight-bold"><i class="fas fa-list-ol mr-2"></i>Applying for Class</label>
+                                <select class="form-control" name="applying_grade" required>
+                                    <option value="">Choose...</option>
+                                    <optgroup label="Early Years">
+                                        
+                                        <option value="Kindergarten 1">Kindergarten 1</option>
+                                        <option value="Kindergarten 2">Kindergarten 2</option>
+                                        <option value="Nursery">Nursery</option>
+
+                                    </optgroup>
+                                    <optgroup label="Primary School">
+                                        <option value="Primary 1">Primary 1</option>
+                                        <option value="Primary 2">Primary 2</option>
+                                        <option value="Primary 3">Primary 3</option>
+                                        <option value="Primary 4">Primary 4</option>
+                                        <option value="Primary 5">Primary 5</option>
+                                        <option value="Primary 6">Primary 6</option>
+                                    </optgroup>
+                                    <optgroup label="Secondary School">
+                                        <option value="JSS 1">JSS 1</option>
+                                        <option value="JSS 2">JSS 2</option>
+                                        <option value="JSS 3">JSS 3</option>
+                                        <option value="SSS 1">SSS 1</option>
+                                        <option value="SSS 2">SSS 2</option>
+                                        <option value="SSS 3">SSS 3</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="font-weight-bold"><i class="fas fa-user-tie mr-2"></i>Parent/Guardian Name</label>
+                            <input type="text" class="form-control" name="parent_name" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="font-weight-bold"><i class="fas fa-phone mr-2"></i>Phone Number</label>
+                                <input type="tel" class="form-control" name="parent_phone" placeholder="080XXXXXXXX" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="font-weight-bold"><i class="fas fa-envelope mr-2"></i>Email Address</label>
+                                <input type="email" class="form-control" name="parent_email" placeholder="email@example.com" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="font-weight-bold"><i class="fas fa-map-marker-alt mr-2"></i>Residential Address</label>
+                            <textarea class="form-control" name="address" rows="2" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-submit btn-block btn-lg">
+                            Submit Inquiry <i class="fas fa-paper-plane ml-2"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admissions-enquiries mt-5 pt-5 animate__animated animate__fadeInUp">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Admission Enquiries</h2>
+            <p class="lead text-muted">Schedule a tour or visit us at our offices.</p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-card main-school-card shadow">
+                <i class="fas fa-school contact-icon"></i>
+                <h4>MAIN SCHOOL</h4>
+                <p class="mb-4">
+                    Irepodun Street, After Sammy Hotel,<br>
+                    Imala Elega, Abeokuta, Ogun State.
+                </p>
+                <div class="mt-4">
+                    <p class="mb-1"><i class="fas fa-phone-alt mr-2"></i> <a href="tel:08037149253">0803 714 9253</a></p>
+                    <p><i class="fas fa-phone-alt mr-2"></i> <a href="tel:08033731141">0803 373 1141</a></p>
+                </div>
+            </div>
+
+            <div class="contact-card annex-school-card shadow">
+                <i class="fas fa-school contact-icon"></i>
+                <h4>ANNEX SCHOOL</h4>
+                <p class="mb-4">
+                    Behind Simon Taiwo Ibajesomo Memorial Anglican Church,<br>
+                    Agba Akin (Oosa) Jesu, Akere Off Bode Olude, Abeokuta.
+                </p>
+                <div class="mt-4">
+                    <p><i class="fas fa-phone-alt mr-2"></i> <a href="tel:07044669406">0704 466 9406</a></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 p-4 text-center rounded-lg shadow-sm" style="background: var(--white);">
+            <div class="d-flex flex-column flex-md-row justify-content-center align-items-center mb-3">
+                <p class="mb-2 mb-md-0 mx-3 h5">
+                    <i class="fas fa-envelope mr-2 text-success"></i>
+                    <strong>Email:</strong> <a href="mailto:royalbeess@gmail.com" class="text-success">royalbeess@gmail.com</a>
+                </p>
+                <p class="mb-0 mx-3 h5">
+                    <i class="fas fa-envelope mr-2 text-success"></i>
+                    <strong>Support:</strong> <a href="mailto:help.royalbees@gmail.com" class="text-success">help.royalbees@gmail.com</a>
+                </p>
+            </div>
+            <hr style="max-width: 200px; margin: 15px auto; border-top: 2px solid var(--dark-cream);">
+            <p class="mt-2 text-muted font-weight-bold">
+                <i class="fas fa-clock mr-2 text-success"></i> Office Hours:
+            </p>
+            <p class="text-muted mb-0">
+                Mon - Thurs: 8:00 AM - 4:00 PM | Friday: 8:00 AM - 1:00 PM
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

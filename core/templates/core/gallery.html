@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gallery - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block head_extra %}
+    {# Lightbox2 CSS - REQUIRED for Lightbox functionality #}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
+    <style>
+        .gallery-img-thumbnail {
+            height: 250px; 
+            object-fit: cover; 
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item {
+            overflow: hidden; /* Keeps the zoom effect inside the card */
+            border: none;
+            border-radius: 15px;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(20, 122, 70, 0.2) !important;
+        }
+
+        .gallery-item:hover .gallery-img-thumbnail {
+            transform: scale(1.05); /* Slight zoom on hover */
+        }
+
+        .gallery-item .card-body {
+            height: auto; 
+            min-height: 90px; 
+            border-top: 3px solid var(--main-cream);
+        }
+
+        .gallery-item a {
+            display: block; 
+            line-height: 0; 
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <section class="gallery-page-section py-5">
+        <div class="container">
+            <h1 class="text-center mb-4 display-4 animate__animated animate__fadeInDown" style="color: var(--primary-green); font-weight: 800;">Our School Gallery</h1>
+            <p class="lead text-center mb-5 animate__animated animate__fadeInUp text-muted">
+                A visual journey through the vibrant life, memorable events, and academic excellence at ROYAL BEES SCHOOLS.
+            </p>
+
+            <div class="row g-4 gallery-grid-page">
+                
+                {# --- DYNAMIC IMAGES FROM DJANGO ADMIN --- #}
+                {% for img in images %}
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4 animate__animated animate__zoomIn">
+                        <div class="gallery-item card shadow-sm h-100">
+                            <a href="{{ img.image.url }}" data-lightbox="school-gallery" data-title="{{ img.caption|default:'School Event' }}">
+                                <img src="{{ img.image.url }}" class="card-img-top img-fluid gallery-img-thumbnail" alt="{{ img.caption|default:'School Event' }}" loading="lazy" decoding="async">
+                            </a>
+                            
+                            {% if img.caption %}
+                                <div class="card-body">
+                                    <p class="card-text text-center text-muted mb-0" style="font-weight: 500;">{{ img.caption }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                {% empty %}
+                    {# --- WHAT SHOWS IF NO IMAGES ARE IN THE DATABASE --- #}
+                    <div class="col-12 text-center py-5 animate__animated animate__fadeIn">
+                        <div style="background-color: rgba(20, 122, 70, 0.05); border-radius: 20px; padding: 60px 20px;">
+                            <i class="fas fa-camera-retro mb-3" style="font-size: 4rem; color: var(--main-cream);"></i>
+                            <h3 style="color: var(--primary-green); font-weight: 700;">More Memories Coming Soon!</h3>
+                            <p class="text-muted">Our gallery is currently being updated. Please check back later for beautiful photos of our students and campus.</p>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_js %}
+    {# Lightbox2 JS - REQUIRED for Lightbox functionality #}
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lightbox.option({
+                'resizeDuration': 200,
+                'wrapAround': true,
+                'alwaysShowNavOnTouchDevices': true
+            });
+        });
+    </script>
+{% endblock %}

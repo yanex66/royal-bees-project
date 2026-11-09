@@ -1,0 +1,288 @@
+/* core/static/core/css/style.css */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #FFD700; /* Gold - for "Royal Bees" */
+    color: #333;
+    padding: 1em 0;
+    text-align: center;
+}
+
+header a {
+    color: #333;
+    text-decoration: none;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: #333;
+    text-decoration: none;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+main {
+    padding: 20px;
+    max-width: 960px;
+    margin: 0 auto;
+    background-color: #fff;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    margin-top: 30px;
+}
+
+/* General styling for the content area of the results page if needed */
+/* You might already have general 'main' styling from base.html */
+
+/* Styling for the results table */
+.results-table { /* You'll need to add this class to your <table> tag in the template */
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5em;
+    margin-bottom: 2em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Optional: adds a subtle shadow */
+}
+
+.results-table th,
+.results-table td {
+    border: 1px solid #ddd; /* Light grey border for cells */
+    padding: 10px;
+    text-align: left;
+}
+
+.results-table th {
+    background-color: #4CAF50; /* A pleasant green for table headers */
+    color: white; /* White text on the green background */
+    text-align: center;
+}
+
+/* Zebra striping for table rows for better readability */
+.results-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9; /* Very light grey for even rows */
+}
+
+.results-table tbody tr:hover {
+    background-color: #f1f1f1; /* Slightly darker grey on hover */
+}
+
+/* Styling for the student/session info above the table */
+.result-summary-info h2 {
+    color: #333; /* Dark grey for the "Results for..." heading */
+}
+.result-summary-info p {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 0.5em;
+}
+
+/* Styling the 'Check Result' button */
+form button[type="submit"] {
+    background-color: #FFD700; /* Gold color similar to header */
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button[type="submit"]:hover {
+    background-color: #e6c300; /* Darker gold on hover */
+}
+
+/* Specific Grade Styling Examples (add classes to your grade <td> in template if you want this) */
+.grade-a { color: green; font-weight: bold; }
+.grade-b { color: darkgreen; }
+.grade-c { color: orange; }
+.grade-d { color: darkorange; }
+.grade-f { color: red; font-weight: bold; }
+
+
+
+
+/* Styling for the "Check Result" Form */
+
+/* Style for the introductory paragraph */
+.page-intro-text { /* Add this class to the <p> tag before the form if you like */
+    font-size: 1.1em;
+    color: #333;
+    margin-bottom: 1.5em;
+    line-height: 1.6;
+}
+
+/* Styling for the fieldset and legend */
+fieldset {
+    border: 1px solid #ccc; /* Light grey border for the fieldset */
+    border-radius: 8px;     /* Rounded corners */
+    padding: 20px;          /* Padding inside the fieldset */
+    margin-bottom: 2em;     /* Space below the fieldset */
+    background-color: #f9f9f9; /* Very light grey background for the form area */
+}
+
+fieldset legend {
+    font-weight: bold;
+    font-size: 1.3em;
+    color: #333; /* Dark grey for the legend text */
+    padding: 0 10px;      /* Padding around the legend text */
+    margin-left: 10px;    /* Align with padding */
+}
+
+/* Styling for labels */
+form label {
+    display: block;       /* Make labels take the full width */
+    margin-bottom: 5px;   /* Space below each label */
+    font-weight: bold;
+    color: #555;         /* Slightly lighter grey for label text */
+}
+
+/* Common styling for input fields and select dropdowns */
+form input[type="text"],
+form input[type="password"],
+form select {
+    width: 100%;              /* Make them take the full width of their container */
+    padding: 10px;            /* Padding inside the fields */
+    margin-bottom: 15px;      /* Space below each field */
+    border: 1px solid #ccc;   /* Border for the fields */
+    border-radius: 4px;       /* Slightly rounded corners for fields */
+    box-sizing: border-box;   /* Important for width calculation including padding and border */
+    font-size: 1em;
+}
+
+/* Specific styling for select elements to ensure consistent height with inputs */
+form select {
+    height: 40px; /* Adjust as needed to match input field height */
+    background-color: white;
+}
+
+/* Focus style for inputs and selects */
+form input[type="text"]:focus,
+form input[type="password"]:focus,
+form select:focus {
+    border-color: #FFD700; /* Gold border on focus, matching your header */
+    outline: none;          /* Remove default browser outline */
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Subtle gold glow on focus */
+}
+
+/* We already styled the button, but here it is again for completeness if you adjust it */
+form button[type="submit"] {
+    background-color: #FFD700; /* Gold color */
+    color: #333;
+    padding: 12px 25px; /* Slightly larger padding */
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em; /* Slightly larger font */
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block; /* Or block with margin: 0 auto for centering */
+}
+
+form button[type="submit"]:hover {
+    background-color: #e6c300; /* Darker gold on hover */
+}
+
+/* Spacing for paragraphs containing form elements, if you have <p> tags around label+input */
+fieldset > p {
+    margin-bottom: 1em; /* Adjust spacing between form rows */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Django Messages Styling */
+ul.messages {
+    list-style-type: none; /* Removes bullet points */
+    padding: 0;            /* Removes default padding */
+    margin: 0 0 1em 0;     /* Top, Right, Bottom, Left margin */
+}
+
+ul.messages li { /* Base style for all message list items */
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid transparent; /* Base border, specific color per type */
+    line-height: 1.4;
+}
+
+/* Specific styles for different message levels/tags */
+ul.messages li.debug {
+    background-color: #f0f0f0; 
+    color: #333;
+    border-color: #ddd;
+}
+
+ul.messages li.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-color: #bee5eb;
+}
+
+ul.messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+ul.messages li.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-color: #ffeeba;
+}
+
+ul.messages li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.hero-section {
+    background: url("{% static 'core/images/hero_bg.jpg' %}") no-repeat center center / cover;
+    min-height: 500px; /* Adjust as needed */
+    position: relative;
+    overflow: hidden;
+}
+.hero-section::before { /* Optional: Overlay for better text readability */
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 1;
+}
+.hero-section > div {
+    position: relative;
+    z-index: 2; /* Bring content to front of overlay */
+}

@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title|default:"Result Portal" }} - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block content %}
+    <style>
+        :root {
+            --primary-green: #147a46;
+            --dark-green: #0d5c34;
+            --main-cream: #f9e8a2;
+            --dark-cream: #f0da81;
+            --pure-white: #ffffff;
+            --card-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .portal-bg {
+            background-color: #fffdf5;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23f0da81' stroke-width='1' opacity='0.3'/%3E%3C/svg%3E");
+            min-height: 100vh;
+            padding-bottom: 50px;
+            position: relative; /* Required for sidebar positioning */
+        }
+
+        /* --- MOTIVATIONAL SIDEBARS --- */
+        .motivation-sidebar {
+            position: fixed;
+            top: 200px;
+            width: 200px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            border: 2px solid var(--dark-cream);
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            z-index: 5;
+        }
+
+        .sidebar-left { left: 40px; }
+        .sidebar-right { right: 40px; }
+
+        .motivation-item { margin-bottom: 30px; }
+        .motivation-item i { font-size: 2rem; color: var(--primary-green); margin-bottom: 10px; display: block; }
+        .motivation-item p { font-size: 0.9rem; font-weight: 600; color: #444; font-style: italic; margin: 0; line-height: 1.4; }
+
+        /* --- Existing Header --- */
+        .header-box {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            color: var(--main-cream);
+            border-radius: 0 0 25px 25px;
+            margin-bottom: 50px;
+            box-shadow: var(--card-shadow);
+        }
+
+        /* --- Existing Form --- */
+        .form-card { 
+            background: var(--pure-white); 
+            max-width: 550px; 
+            margin: 0 auto; 
+            padding: 50px; 
+            border-radius: 25px; 
+            border: 2px solid var(--dark-cream); 
+            box-shadow: var(--card-shadow);
+            position: relative;
+            z-index: 10;
+        }
+
+        .pin-container { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+        .pin-box { width: 50px; height: 60px; text-align: center; font-size: 1.5rem; font-weight: 800; border: 2px solid #eee; border-radius: 8px; background: #fafafa; }
+        .pin-box:focus { border-color: var(--primary-green); outline: none; background: #fff; }
+
+        .btn-portal { width: 100%; padding: 18px; background: var(--primary-green); color: var(--main-cream) !important; border: none; border-radius: 12px; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        .btn-portal:hover { background: var(--dark-green); transform: translateY(-3px); }
+
+        /* Hide sidebars on smaller screens to prevent overlap */
+        @media (max-width: 1200px) {
+            .motivation-sidebar { display: none; }
+        }
+    </style>
+
+    <div class="portal-bg">
+        
+        <div class="motivation-sidebar sidebar-left animate__animated animate__fadeInLeft">
+            <div class="motivation-item">
+                <i class="fas fa-brain"></i>
+                <p>"Wisdom begins with wonder. Keep learning!"</p>
+            </div>
+            <hr style="border-top: 1px solid var(--dark-cream);">
+            <div class="motivation-item">
+                <i class="fas fa-lightbulb"></i>
+                <p>"Every bright future starts with a hard-working present."</p>
+            </div>
+        </div>
+
+        <div class="motivation-sidebar sidebar-right animate__animated animate__fadeInRight">
+            <div class="motivation-item">
+                <i class="fas fa-trophy"></i>
+                <p>"Excellence is not a skill, it is an attitude."</p>
+            </div>
+            <hr style="border-top: 1px solid var(--dark-cream);">
+            <div class="motivation-item">
+                <i class="fas fa-rocket"></i>
+                <p>"Aim for the stars, and you will reach the moon."</p>
+            </div>
+        </div>
+
+        <div class="header-box">
+            <div class="container">
+                <i class="fas fa-user-shield fa-3x mb-3"></i>
+                <h1 style="color: var(--main-cream)!important; border:none;">Result Portal</h1>
+                <p class="lead">Enter your credentials to access your termly report</p>
+            </div>
+        </div>
+
+        <div class="container" style="max-width: 600px;">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger animate__animated animate__shakeX text-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="container">
+            <div class="form-card animate__animated animate__fadeInUp">
+                <form method="post" action="{% url 'results:check_results' %}" id="resultForm">
+                    {% csrf_token %}
+                    <fieldset>
+                        <legend style="color: var(--primary-green); font-weight: bold;">IDENTITY CHECK</legend>
+                        
+                        <div class="form-group">
+                            <label style="font-weight: bold; color: #444;">Admission Number</label>
+                            <input type="text" name="student_id" id="student_id" class="form-control" placeholder="e.g. RBS/2026/001" value="{{ request.POST.student_id }}" required>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label style="font-weight: bold; color: #444;">Secure 4-Digit PIN</label>
+                            <div class="pin-container">
+                                <input type="text" class="pin-box" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="pin-box" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="pin-box" maxlength="1" pattern="\d*" inputmode="numeric">
+                                <input type="text" class="pin-box" maxlength="1" pattern="\d*" inputmode="numeric">
+                            </div>
+                            <input type="hidden" name="pin" id="hidden_pin">
+                        </div>
+
+                        <button type="submit" class="btn-portal">
+                            <i class="fas fa-lock-open mr-2"></i> Access My Results
+                        </button>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        <div style="height: 100px;"></div>
+    </div>
+
+    <script>
+        const pinBoxes = document.querySelectorAll('.pin-box');
+        const hiddenPin = document.getElementById('hidden_pin');
+        const form = document.getElementById('resultForm');
+
+        pinBoxes.forEach((box, index) => {
+            box.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < pinBoxes.length - 1) {
+                    pinBoxes[index + 1].focus();
+                }
+                updateHiddenPin();
+            });
+
+            box.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    pinBoxes[index - 1].focus();
+                }
+            });
+        });
+
+        function updateHiddenPin() {
+            let fullPin = "";
+            pinBoxes.forEach(box => fullPin += box.value);
+            hiddenPin.value = fullPin;
+        }
+
+        form.addEventListener('submit', (e) => {
+            updateHiddenPin();
+            if (hiddenPin.value.length < 4) {
+                e.preventDefault();
+                alert("Please enter the full 4-digit PIN.");
+            }
+        });
+    </script>
+{% endblock %}

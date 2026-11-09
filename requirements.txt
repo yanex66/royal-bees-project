@@ -1,0 +1,7 @@
+Django==5.2.3
+python-dotenv
+django-jazzmin
+whitenoise
+requests
+Pillow
+gunicorn

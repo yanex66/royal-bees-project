@@ -1,0 +1,38 @@
+{% extends "admin/login.html" %}
+
+{% block footer %}
+    {{ block.super }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Locate the password input field by its ID
+            const passwordField = document.querySelector('#id_password');
+            
+            if (passwordField) {
+                // 2. Create the "Eye" button
+                const toggleBtn = document.createElement('span');
+                toggleBtn.innerHTML = '👁️'; // You can also use an icon class if using FontAwesome
+                toggleBtn.style.cssText = `
+                    position: absolute;
+                    right: 15px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    cursor: pointer;
+                    z-index: 100;
+                    font-size: 1.2rem;
+                `;
+                
+                // 3. Make the parent container relative so the eye stays inside the box
+                const parent = passwordField.parentElement;
+                parent.style.position = 'relative';
+                parent.appendChild(toggleBtn);
+
+                // 4. Add the click logic
+                toggleBtn.addEventListener('click', function () {
+                    const isPassword = passwordField.getAttribute('type') === 'password';
+                    passwordField.setAttribute('type', isPassword ? 'text' : 'password');
+                    this.innerHTML = isPassword ? '🙈' : '👁️';
+                });
+            }
+        });
+    </script>
+{% endblock %}

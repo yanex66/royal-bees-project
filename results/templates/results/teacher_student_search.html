@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title }} - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-green: #147a46;
+        --dark-green: #0d5c34;
+        --main-cream: #f9e8a2;
+        --pure-white: #ffffff;
+        --soft-bg: #f8f9fa;
+        --radius: 12px;
+    }
+
+    .teacher-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .search-panel {
+        background: var(--pure-white);
+        padding: 40px;
+        border-radius: var(--radius);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+        margin-bottom: 40px;
+    }
+
+    h1 {
+        color: var(--primary-green);
+        font-weight: 800;
+        border: none;
+        margin-bottom: 10px;
+    }
+
+    .intro-text {
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    /* --- Search Bar Styling --- */
+    .search-box {
+        display: flex;
+        gap: 10px;
+        background: var(--soft-bg);
+        padding: 10px;
+        border-radius: 50px;
+        border: 2px solid #eee;
+        transition: 0.3s;
+    }
+
+    .search-box:focus-within {
+        border-color: var(--primary-green);
+        background: var(--pure-white);
+        box-shadow: 0 0 15px rgba(20, 122, 70, 0.1);
+    }
+
+    .search-box input {
+        flex-grow: 1;
+        border: none;
+        background: transparent;
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        outline: none;
+    }
+
+    .btn-search {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-search:hover {
+        background: var(--dark-green);
+        transform: scale(1.05);
+    }
+
+    /* --- Results Table --- */
+    .results-card {
+        background: var(--pure-white);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .results-table th {
+        background: var(--primary-green);
+        color: var(--main-cream);
+        padding: 15px 20px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-align: left;
+    }
+
+    .results-table td {
+        padding: 18px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+    }
+
+    .results-table tr:hover {
+        background-color: #fffdf5;
+    }
+
+    .student-id-tag {
+        background: var(--soft-bg);
+        padding: 4px 10px;
+        border-radius: 5px;
+        font-family: monospace;
+        font-weight: bold;
+        color: var(--dark-green);
+    }
+
+    .btn-proceed {
+        display: inline-block;
+        background: var(--primary-green);
+        color: white !important;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .btn-proceed:hover {
+        background: var(--dark-green);
+        transform: translateX(5px);
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 40px;
+        background: #fff5f5;
+        border-radius: var(--radius);
+        color: #c53030;
+    }
+</style>
+
+<div class="teacher-container">
+    <div class="search-panel animate__animated animate__fadeInDown">
+        <h1><i class="fas fa-search-plus mr-2"></i> {{ page_title }}</h1>
+        <p class="intro-text">Find a student to manage their academic scores and termly performance records.</p>
+
+        <form method="POST" action="{% url 'results:teacher_search_student' %}">
+            {% csrf_token %}
+            <div class="search-box">
+                <input type="text" name="search_query" id="search_query" 
+                       placeholder="Search by ID, First Name, or Last Name..." 
+                       value="{{ search_query }}" required>
+                <button type="submit" class="btn-search">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if request.method == "POST" %}
+        <div class="animate__animated animate__fadeInUp">
+            {% if students_found %}
+                <h4 class="mb-3 px-2" style="color: var(--primary-green); font-weight: 700;">
+                    <i class="fas fa-user-check mr-2"></i> {{ students_found.count }} Student{{ students_found.count|pluralize }} Found
+                </h4>
+                
+                <div class="results-card">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Full Name</th>
+                                <th>Current Class</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students_found %}
+                            <tr>
+                                <td><span class="student-id-tag">{{ student.student_id }}</span></td>
+                                <td style="font-weight: 700; color: #333;">{{ student.get_full_name }}</td>
+                                <td>{{ student.current_class.name|default:"Unassigned" }}</td>
+                                <td style="text-align: right;">
+                                    <a href="{% url 'results:teacher_select_session_term' student_id=student.id %}" class="btn-proceed">
+                                        Select & Proceed <i class="fas fa-chevron-right ml-1"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                {% if search_query %}
+                    <div class="no-results shadow-sm">
+                        <i class="fas fa-user-times fa-2x mb-2"></i>
+                        <p class="mb-0">No active students found matching "<strong>{{ search_query }}</strong>".</p>
+                        <small>Please check the spelling or Admission Number.</small>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-5">
+        <p class="small text-muted">
+            <i class="fas fa-info-circle mr-1"></i> Need help? Contact the administrator for database access permissions.
+        </p>
+    </div>
+</div>
+{% endblock %}

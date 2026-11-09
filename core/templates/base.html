@@ -1,0 +1,420 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ROYAL BEES INTERNATIONAL SCHOOL{% endblock %}</title>
+
+    {# External CSS frameworks #}
+    <link rel="preconnect" href="https://stackpath.bootstrapcdn.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></noscript>
+    
+    {# Google Fonts - Added 'Cinzel' for a regal, prestigious school title #}
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="icon" href="{% static 'core/images/favicon.ico' %}" type="image/x-icon">
+
+    {% block head_extra %}{% endblock %}
+
+    <style>
+        :root {
+            --primary-green: #147a46;
+            --accent-green: #0d5c34;
+            --cream-light: #f9e8a2;
+            --cream-dark: #f0da81;
+            --white: #ffffff;
+            --text-dark: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--cream-light);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- FLYING BEES BACKGROUND ANIMATION --- */
+        .bees-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none; /* Ensures you can click through them */
+            z-index: 0; /* Puts them all the way in the background */
+            overflow: hidden;
+        }
+
+        .bee {
+            position: absolute;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+        }
+
+        /* Bee 1: Flies left to right */
+        @keyframes flyRightBob {
+            0% { transform: translate(-10vw, 0px) scaleX(-1); }
+            25% { transform: translate(30vw, -30px) scaleX(-1); }
+            50% { transform: translate(60vw, 20px) scaleX(-1); }
+            75% { transform: translate(90vw, -20px) scaleX(-1); }
+            100% { transform: translate(110vw, 0px) scaleX(-1); }
+        }
+
+        /* Bee 2: Flies right to left */
+        @keyframes flyLeftBob {
+            0% { transform: translate(110vw, 0px); }
+            25% { transform: translate(80vw, 40px); }
+            50% { transform: translate(40vw, -20px); }
+            75% { transform: translate(10vw, 30px); }
+            100% { transform: translate(-10vw, 0px); }
+        }
+
+        .bee-1 { font-size: 24px; top: 15%; animation: flyRightBob 18s infinite 0s; }
+        .bee-2 { font-size: 32px; top: 40%; animation: flyLeftBob 22s infinite 4s; }
+        .bee-3 { font-size: 20px; top: 65%; animation: flyRightBob 25s infinite 2s; }
+        .bee-4 { font-size: 28px; top: 85%; animation: flyLeftBob 19s infinite 7s; }
+        .bee-5 { font-size: 26px; top: 25%; animation: flyRightBob 28s infinite 12s; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* --- UPDATED COVER HEADER --- */
+        .main-header {
+            background-color: var(--primary-green);
+            background-image: linear-gradient(rgba(20, 122, 70, 0.85), rgba(13, 92, 52, 0.95)), url("{% static 'core/images/students_cover.jpg' %}");
+            background-size: cover;
+            background-position: center 30%;
+            background-repeat: no-repeat;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 6px solid var(--cream-dark);
+            min-height: 200px;
+        }
+
+        .header-side-logo {
+            height: 110px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .header-center-content {
+            flex-grow: 1;
+            text-align: center;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .site-title-link {
+            margin-bottom: 15px;
+        }
+
+        .site-title-link a {
+            font-family: 'Cinzel', serif;
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--cream-light) !important;
+            text-decoration: none;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.8);
+        }
+
+        /* --- DESKTOP INLINE NAVIGATION --- */
+        .desktop-nav {
+            width: 100%;
+        }
+
+        .nav-inline-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .nav-inline-list a {
+            color: var(--white);
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+            transition: color 0.3s, transform 0.3s;
+            padding: 5px 10px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-inline-list a:hover {
+            color: var(--cream-light);
+            border-bottom: 2px solid var(--cream-light);
+            text-decoration: none;
+        }
+
+        /* --- SMALLER TOP-RIGHT HAMBURGER --- */
+        .hamburger {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem; 
+            background: none;
+            border: none;
+            color: var(--cream-light);
+            cursor: pointer;
+            z-index: 1002;
+            transition: 0.3s;
+        }
+
+        .hamburger:hover {
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar-menu {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 2000;
+            top: 0;
+            left: 0;
+            background-color: var(--primary-green);
+            overflow-x: hidden;
+            transition: 0.4s;
+            padding-top: 80px;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+        }
+
+        #sidebar-menu .nav-item a {
+            padding: 18px 35px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            color: var(--cream-light);
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+        
+        #sidebar-menu .nav-item a:hover {
+            background-color: var(--accent-green);
+            color: var(--white);
+            padding-left: 45px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 45px;
+            color: var(--cream-light);
+            text-decoration: none;
+        }
+
+        main {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: var(--white);
+            border-radius: 20px;
+            min-height: 60vh;
+            border-top: 10px solid var(--primary-green);
+            position: relative; 
+            z-index: 10;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        footer {
+            background-color: var(--primary-green);
+            color: var(--cream-light);
+            text-align: center;
+            padding: 50px 0;
+            border-top: 8px solid var(--cream-dark);
+            position: relative; 
+            z-index: 10;
+        }
+
+        .footer-instagram {
+            color: var(--white);
+            font-size: 2rem;
+            transition: 0.3s;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .footer-instagram:hover {
+            color: var(--cream-light);
+            transform: scale(1.1);
+        }
+
+        /* --- DJANGO MESSAGES ALERT STYLING (FIXES VS CODE ERRORS) --- */
+        .alert-custom { border-radius: 10px; }
+        .alert-custom.alert-danger { border-left: 6px solid #dc3545; }
+        .alert-custom.alert-success { border-left: 6px solid var(--primary-green); }
+        .alert-custom.alert-warning { border-left: 6px solid #ffc107; }
+        .alert-custom.alert-info { border-left: 6px solid #17a2b8; }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 992px) {
+            .desktop-nav { display: none; }
+            .site-title-link a { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 768px) {
+            .main-header { min-height: 140px; padding: 10px; }
+            .header-side-logo { height: 60px; }
+            .site-title-link a { font-size: 1.2rem; letter-spacing: 1px; }
+            .hamburger { font-size: 1.2rem; top: 10px; right: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bees-container">
+        <div class="bee bee-1">🐝</div>
+        <div class="bee bee-2">🐝</div>
+        <div class="bee bee-3">🐝</div>
+        <div class="bee bee-4">🐝</div>
+        <div class="bee bee-5">🐝</div>
+    </div>
+
+    <header class="main-header">
+        <img src="{% static 'core/images/logos/prlogo.png' %}" alt="Royal Bees Logo" class="header-side-logo">
+
+        <div class="header-center-content">
+            <h1 class="site-title-link">
+                <a href="{% url 'home' %}">ROYAL BEES INTERNATIONAL SCHOOL</a>
+            </h1>
+            
+            <nav class="desktop-nav">
+                <ul class="nav-inline-list">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'about' %}">About Us</a></li>
+                    <li><a href="{% url 'results:pay_fees' %}" style="color: #ffc107;">Pay Fees</a></li>
+                    <li><a href="{% url 'admissions' %}">Admissions</a></li>
+                    <li><a href="{% url 'gallery' %}">Gallery</a></li>
+                    <li><a href="{% url 'contact_us' %}">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <img src="{% static 'core/images/logos/r logo.png' %}" alt="Royal Bees Logo" class="header-side-logo">
+
+        <button class="hamburger" id="openSidebarBtn" aria-label="Open Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </header>
+
+    <div id="sidebar-menu">
+        <a href="javascript:void(0)" class="close-btn" id="closeSidebarBtn">&times;</a>
+        <ul class="nav-list" style="list-style: none; padding: 0;">
+            <li class="nav-item"><a href="{% url 'home' %}"><i class="fas fa-home mr-3"></i> Home</a></li>
+            <li class="nav-item"><a href="{% url 'results:pay_fees' %}" style="color: #ffc107;"><i class="fas fa-credit-card mr-3"></i> Pay School Fees</a></li>
+            <li class="nav-item"><a href="{% url 'about' %}"><i class="fas fa-info-circle mr-3"></i> About Us</a></li>
+            <li class="nav-item"><a href="{% url 'academics_overview' %}"><i class="fas fa-graduation-cap mr-3"></i> Academics</a></li>
+            <li class="nav-item"><a href="{% url 'admissions' %}"><i class="fas fa-user-plus mr-3"></i> Admissions</a></li>
+            <li class="nav-item"><a href="{% url 'news_list' %}"><i class="fas fa-newspaper mr-3"></i> News</a></li>
+            <li class="nav-item"><a href="{% url 'event_list' %}"><i class="fas fa-calendar-alt mr-3"></i> Events</a></li>
+            <li class="nav-item"><a href="{% url 'gallery' %}"><i class="fas fa-images mr-3"></i> Gallery</a></li>
+            <li class="nav-item"><a href="{% url 'teacher_gate' %}"><i class="fas fa-chalkboard-teacher mr-3"></i> Teacher Entry</a></li>
+            <li class="nav-item"><a href="{% url 'results:check_results' %}"><i class="fas fa-file-invoice mr-3"></i> Check Results</a></li>
+            <li class="nav-item"><a href="{% url 'contact_us' %}"><i class="fas fa-envelope mr-3"></i> Contact Us</a></li>
+        </ul>
+    </div>
+
+    <main class="animate__animated animate__fadeInUp">
+        
+        {# --- NEW: DJANGO MESSAGES ALERT SYSTEM --- #}
+        {% if messages %}
+            <div class="container mt-4 mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-custom {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+                        <strong>
+                            <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} mr-2"></i>
+                        </strong> 
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+   <footer>
+        <div class="container">
+            <h4 style="color: var(--white); font-weight: 800; margin-bottom: 20px;">ROYAL BEES INTERNATIONAL SCHOOL</h4>
+            
+            <div class="social-links">
+                <!-- Instagram Link -->
+                <a href="https://www.instagram.com/royalbeesschools/" target="_blank" class="footer-instagram" title="Follow us on Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+
+                <!-- TikTok Link -->
+                <a href="https://www.tiktok.com/@royalbeesschools?_r=1&_t=ZS-96CoefihVY8" target="_blank" class="footer-instagram" title="Follow us on TikTok" style="margin-left: 20px;">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+            </div>
+
+            <p>&copy; {% now "Y" %} | Destined to be Leaders</p>
+        </div>
+    </footer>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar-menu');
+            const openBtn = document.getElementById('openSidebarBtn');
+            const closeBtn = document.getElementById('closeSidebarBtn');
+
+            openBtn.addEventListener('click', () => { sidebar.style.width = "300px"; });
+            closeBtn.addEventListener('click', () => { sidebar.style.width = "0"; });
+
+            document.addEventListener('mousedown', (e) => {
+                if (sidebar.style.width === "300px" && !sidebar.contains(e.target) && !openBtn.contains(e.target)) {
+                    sidebar.style.width = "0";
+                }
+            });
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

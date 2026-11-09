@@ -1,0 +1,829 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block head_extra %}
+    <link rel="preload" as="image" href="{% static 'core/images/teampics/schl.jpg' %}" fetchpriority="high">
+{% endblock %}
+
+{% block content %}
+    <style>
+        :root {
+            --school-green: #147a46;
+            --school-green-dark: #0d5c34;
+            --school-cream: #f9e8a2;
+            --school-cream-light: #fdf6d8;
+            --school-cream-dark: #f0da81;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        /* --- Global Layout Adjustments --- */
+        .home-wrapper {
+            overflow: hidden;
+            background-color: var(--white);
+        }
+
+        /* --- Text Carousel Banner --- */
+        .rotating-banner {
+            background-color: var(--school-cream);
+            color: var(--school-green-dark);
+            text-align: center;
+            height: 50px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 3px solid var(--school-green);
+            z-index: 10;
+        }
+
+        .message-container {
+            position: relative;
+            height: 30px;
+            width: 100%;
+        }
+
+        .message {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 0;
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 10px;
+        }
+
+        @keyframes messageRotate {
+            0% { opacity: 0; transform: translateY(20px); }
+            5% { opacity: 1; transform: translateY(0); }
+            15% { opacity: 1; transform: translateY(0); }
+            20% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 0; }
+        }
+
+        .message:nth-child(1) { animation: messageRotate 30s infinite 0s; }
+        .message:nth-child(2) { animation: messageRotate 30s infinite 5s; }
+        .message:nth-child(3) { animation: messageRotate 30s infinite 10s; }
+        .message:nth-child(4) { animation: messageRotate 30s infinite 15s; }
+        .message:nth-child(5) { animation: messageRotate 30s infinite 20s; }
+        .message:nth-child(6) { animation: messageRotate 30s infinite 25s; }
+
+        /* --- Hero Section Styling --- */
+        .hero-section {
+            position: relative;
+            padding: 120px 0;
+            /* Updated to use the new school image */
+            background: linear-gradient(rgba(20, 122, 70, 0.7), rgba(20, 122, 70, 0.5)), 
+                        url("{% static 'core/images/teampics/schl.jpg' %}") no-repeat center center;
+            background-size: cover;
+            clip-path: ellipse(150% 100% at 50% 0%);
+            margin-top: -5px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-section h1 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-weight: 900;
+            color: var(--school-cream);
+            line-height: 1.1;
+            text-shadow: 3px 3px 15px rgba(0,0,0,0.4);
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .hero-section .lead {
+            color: var(--white);
+            font-size: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            font-weight: 300;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        /* --- Quick Links Grid --- */
+        .quick-links {
+            padding: 80px 0;
+            background-image: radial-gradient(var(--school-cream-light) 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .link-card {
+            background: var(--white);
+            border: 2px solid var(--school-cream-dark);
+            border-radius: 20px;
+            padding: 40px 20px;
+            height: 100%;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: var(--school-green);
+            transition: var(--transition);
+            z-index: 0;
+        }
+
+        .link-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow);
+            border-color: var(--school-green);
+        }
+
+        .link-card:hover::before {
+            height: 100%;
+        }
+
+        .link-card .content-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .link-card i {
+            font-size: 3.5rem;
+            color: var(--school-green);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .link-card h5 {
+            color: var(--school-green-dark);
+            font-weight: 700;
+            margin: 0;
+            transition: var(--transition);
+        }
+
+        .link-card:hover i, .link-card:hover h5 {
+            color: var(--white) !important;
+        }
+
+        /* --- About Section Styling --- */
+        .about-home {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .image-stack {
+            position: relative;
+            padding-bottom: 50px;
+        }
+
+        .image-stack img {
+            width: 90%;
+            border-radius: 30px;
+            border: 8px solid var(--school-cream);
+            box-shadow: var(--shadow);
+        }
+
+        .experience-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--school-green);
+            color: var(--white);
+            padding: 25px 35px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .experience-badge span {
+            display: block;
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1;
+            margin: 5px 0;
+        }
+
+        /* --- NEW: News & Events Section --- */
+        .news-events-section {
+            background-color: var(--school-cream-light);
+            padding: 80px 0;
+        }
+
+        .news-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+            height: 100%;
+            border-bottom: 5px solid var(--school-green);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+        }
+
+        .news-img-wrapper {
+            height: 200px;
+            background-color: var(--school-cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .news-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .event-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            border-left: 5px solid var(--school-green);
+            transition: var(--transition);
+        }
+
+        .event-card:hover {
+            transform: translateX(8px);
+            box-shadow: var(--shadow);
+        }
+
+        .event-date-badge {
+            background: var(--school-cream);
+            color: var(--school-green-dark);
+            min-width: 75px;
+            text-align: center;
+            padding: 12px 10px;
+            border-radius: 12px;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .event-date-badge .day { font-size: 1.8rem; line-height: 1; }
+        .event-date-badge .month { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- AUTOMATIC SCROLLING TESTIMONIALS --- */
+        .testimonial-section {
+            padding: 100px 0;
+            background-color: var(--white);
+            border-radius: 100px 100px 0 0;
+            overflow: hidden; 
+        }
+
+        .testimonial-scroller-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        /* Gradient fading edges for smooth enter/exit */
+        .testimonial-scroller-container::before,
+        .testimonial-scroller-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 10vw;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .testimonial-scroller-container::before {
+            left: 0;
+            background: linear-gradient(to right, var(--white) 0%, transparent 100%);
+        }
+
+        .testimonial-scroller-container::after {
+            right: 0;
+            background: linear-gradient(to left, var(--white) 0%, transparent 100%);
+        }
+
+        .testimonial-track {
+            display: flex;
+            width: max-content; 
+            animation: scrollTestimonials 40s linear infinite;
+        }
+
+        .testimonial-track:hover {
+            animation-play-state: paused;
+        }
+
+        .testimonial-item {
+            background: var(--school-cream-light);
+            padding: 40px;
+            border-radius: 30px;
+            margin: 0 20px;
+            width: 400px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            border-bottom: 5px solid var(--school-green);
+            flex-shrink: 0; 
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .quote-icon {
+            color: var(--school-cream-dark);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        @keyframes scrollTestimonials {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } 
+        }
+
+        /* --- Call to Action --- */
+        .enroll-cta {
+            padding: 100px 0;
+            background: linear-gradient(rgba(20, 122, 70, 0.95), rgba(20, 122, 70, 0.95)), 
+                        url("{% static 'core/images/Rimages/cta_bg.jpg' %}") no-repeat center center;
+            background-size: cover;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .enroll-cta h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--school-cream);
+            border: none;
+        }
+
+        .enroll-cta .btn-light {
+            background-color: var(--school-cream);
+            border: none;
+            color: var(--school-green-dark);
+            padding: 18px 45px;
+            font-weight: 700;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .enroll-cta .btn-light:hover {
+            transform: scale(1.1);
+            background-color: var(--white);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* --- Decorative SVG Bee Patterns --- */
+        .honeycomb-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23147a46' stroke-width='1'/%3E%3C/svg%3E");
+        }
+
+        /* ==========================================================================
+           --- MOBILE RESPONSIVENESS ADJUSTMENTS --- 
+           ========================================================================== */
+           
+        /* Tablet & Large Mobile */
+        @media (max-width: 991px) {
+            .hero-section { padding: 80px 0; }
+            .hero-section h1 { font-size: 2.8rem; }
+            .experience-badge { padding: 20px; right: 10px; }
+            .enroll-cta h2 { font-size: 2.2rem; }
+            .testimonial-item { width: 340px; padding: 30px; } 
+        }
+
+        /* Small Mobile Devices (Phones) */
+        @media (max-width: 576px) {
+            .message { font-size: 0.85rem; }
+            .hero-section { padding: 60px 0; clip-path: ellipse(200% 100% at 50% 0%); }
+            .hero-section h1 { font-size: 2.2rem; }
+            .hero-section .lead { font-size: 1.1rem; padding: 0 10px; margin-bottom: 30px; }
+            .quick-links { padding: 50px 0; }
+            .quick-links .col-6 { padding: 5px; }
+            .link-card { padding: 20px 10px; border-radius: 15px; }
+            .link-card i { font-size: 2.2rem; margin-bottom: 10px; }
+            .link-card h5 { font-size: 0.85rem; }
+            .about-home { padding: 60px 0; }
+            .image-stack { padding-bottom: 30px; }
+            .image-stack img { width: 100%; border-width: 5px; }
+            .experience-badge { padding: 15px 20px; right: 0; bottom: -15px; }
+            .experience-badge span { font-size: 2rem; }
+            .about-home h2 { font-size: 2rem; }
+            .news-events-section { padding: 60px 0; }
+            .testimonial-section { padding: 60px 0; border-radius: 40px 40px 0 0; }
+            .testimonial-item { width: 80vw; max-width: 300px; padding: 25px; margin: 0 10px; }
+            .enroll-cta { padding: 60px 0; }
+            .enroll-cta h2 { font-size: 1.8rem; }
+            .enroll-cta .btn-light { padding: 12px 30px; font-size: 1rem; }
+        }
+    </style>
+
+    <div class="home-wrapper">
+        
+        <div class="rotating-banner">
+            <div class="message-container">
+                <p class="message">Welcome to Royal Bees Schools Official Portal</p>
+                <p class="message">Admission Forms for the 2025/2026 Session are now available</p>
+                <p class="message">Nurturing Today's Child for Tomorrow's Leadership</p>
+                <p class="message">Experience Excellence in Learning and Character</p>
+                <p class="message">Apply Today to Secure Your Child's Bright Future</p>
+                <p class="message">Ranked Among the Best Private Schools in the Region</p>
+            </div>
+        </div>
+
+        <section class="hero-section text-center text-white">
+            <div class="honeycomb-bg"></div>
+            <div class="container hero-content">
+                <h1 class="animate__animated animate__fadeInDown">Empowering Minds,<br>Enriching Lives</h1>
+                <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
+                    At Royal Bees Schools, we provide more than just education. We build character, foster creativity, and prepare students for a global future.
+                </p>
+                <div class="hero-btns animate__animated animate__fadeInUp animate__delay-1s">
+                    <a href="{% url 'admissions' %}" class="btn btn-warning btn-lg px-4 py-3 font-weight-bold shadow">
+                        START ADMISSION PROCESS
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="quick-links">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 style="color: var(--school-green); font-weight: 800; border: none;">SCHOOL DASHBOARD</h2>
+                    <p class="text-muted">Access essential school services and information portals</p>
+                </div>
+                <div class="row text-center g-4">
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'about' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-university"></i>
+                                    <h5>About School</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'results:check_results' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-file-signature"></i>
+                                    <h5>Check Results</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'admissions' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    <h5>Admissions</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <a href="{% url 'gallery' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-camera-retro"></i>
+                                    <h5>Photo Gallery</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6 mt-md-4 mt-2">
+                        <a href="{% url 'news_list' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-newspaper"></i>
+                                    <h5>School News</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6 mt-md-4 mt-2">
+                        <a href="{% url 'event_list' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <h5>Events Calendar</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6 mt-md-4 mt-2">
+                        <a href="{% url 'academics_overview' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-book-reader"></i>
+                                    <h5>Academics</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-6 mt-md-4 mt-2">
+                        <a href="{% url 'contact_us' %}" class="text-decoration-none">
+                            <div class="link-card">
+                                <div class="content-inner">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    <h5>Contact Us</h5>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-home">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <div class="image-stack animate__animated animate__fadeInLeft">
+                            <img src="{% static 'core/images/Rimages/WhatsApp Image 2025-06-03 at 08.26.33_122e1df8.jpg' %}" alt="Students Study" loading="lazy" decoding="async">
+                            
+                            <div class="experience-badge">
+                                <small style="display: block; font-size: 0.95rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--school-cream);">Founded</small>
+                                <span>2012</span>
+                                <small style="display: block; font-size: 1.1rem; font-weight: 500;">September 27th</small>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-6 animate__animated animate__fadeInRight">
+                        <div class="ps-lg-5">
+                            <h6 class="text-uppercase font-weight-bold" style="color: var(--school-green); letter-spacing: 2px;">Welcome to Our World</h6>
+                            <h2 class="mb-4" style="border: none; line-height: 1.2;">Why Choose Royal Bees Schools?</h2>
+                            <p class="lead" style="color: #444;">We provide a safe, nurturing, and technologically-driven environment where students can discover their unique talents.</p>
+                            <ul class="list-unstyled mt-4">
+                                <li class="mb-3 d-flex align-items-center">
+                                    <i class="fas fa-check-circle mr-3" style="color: var(--school-green); font-size: 1.4rem;"></i>
+                                    <span class="font-weight-bold">Expert & Dedicated Teaching Faculty</span>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center">
+                                    <i class="fas fa-check-circle mr-3" style="color: var(--school-green); font-size: 1.4rem;"></i>
+                                    <span class="font-weight-bold">World-Class Science & Tech Labs</span>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center">
+                                    <i class="fas fa-check-circle mr-3" style="color: var(--school-green); font-size: 1.4rem;"></i>
+                                    <span class="font-weight-bold">Robust Extra-Curricular Program</span>
+                                </li>
+                                <li class="mb-3 d-flex align-items-center">
+                                    <i class="fas fa-check-circle mr-3" style="color: var(--school-green); font-size: 1.4rem;"></i>
+                                    <span class="font-weight-bold">Focus on Moral & Character Development</span>
+                                </li>
+                            </ul>
+                            <a href="{% url 'about' %}" class="btn btn-outline-success btn-lg mt-4 px-4 font-weight-bold">DISCOVER OUR MISSION</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="news-events-section">
+            <div class="container">
+                <div class="row">
+                    
+                    <div class="col-lg-8 mb-5 mb-lg-0">
+                        <div class="d-flex justify-content-between align-items-end mb-4">
+                            <h2 style="color: var(--school-green); font-weight: 800; margin: 0; border: none;">Latest News</h2>
+                            <a href="{% url 'news_list' %}" class="btn btn-outline-success btn-sm font-weight-bold" style="border-radius: 20px; padding: 5px 15px;">View All News</a>
+                        </div>
+                        
+                        <div class="row g-4">
+                            {% for news in latest_news %}
+                            <div class="col-md-6">
+                                <div class="news-card">
+                                    <div class="news-img-wrapper">
+                                        {% if news.image %}
+                                            <img src="{{ news.image.url }}" alt="{{ news.title }}" loading="lazy" decoding="async">
+                                        {% else %}
+                                            <i class="fas fa-newspaper text-muted" style="font-size: 4rem; opacity: 0.3;"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="p-4 d-flex flex-column flex-grow-1">
+                                        <small class="text-muted mb-2"><i class="fas fa-calendar-alt mr-1" style="color: var(--school-green);"></i> {{ news.published_date|date:"F d, Y" }}</small>
+                                        <h5 style="color: var(--school-green-dark); font-weight: 700; line-height: 1.3;">{{ news.title }}</h5>
+                                        <p class="text-muted small mt-2 flex-grow-1">{{ news.content|truncatewords:15 }}</p>
+                                        <a href="{% url 'news_list' %}" class="text-success font-weight-bold" style="text-decoration: none; font-size: 0.95rem;">Read Full Story <i class="fas fa-arrow-right ml-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center py-5">
+                                <i class="fas fa-bullhorn text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="text-muted mb-0">No recent announcements at this time. Check back soon!</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="d-flex justify-content-between align-items-end mb-4">
+                            <h2 style="color: var(--school-green); font-weight: 800; margin: 0; border: none;">Events</h2>
+                            <a href="{% url 'event_list' %}" class="btn btn-outline-success btn-sm font-weight-bold" style="border-radius: 20px; padding: 5px 15px;">Calendar</a>
+                        </div>
+                        
+                        <div class="events-wrapper">
+                            {% for event in upcoming_events %}
+                            <div class="event-card">
+                                <div class="event-date-badge shadow-sm">
+                                    <div class="day">{{ event.start_datetime|date:"d" }}</div>
+                                    <div class="month">{{ event.start_datetime|date:"M" }}</div>
+                                </div>
+                                <div>
+                                    <h6 style="color: var(--school-green-dark); font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; line-height: 1.2;">{{ event.title }}</h6>
+                                    <small class="text-muted d-block mb-1"><i class="fas fa-clock mr-1" style="color: var(--school-green);"></i> {{ event.start_datetime|time:"g:i A" }}</small>
+                                    {% if event.location %}
+                                    <small class="text-muted d-block"><i class="fas fa-map-marker-alt mr-1" style="color: var(--school-green);"></i> {{ event.location }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="p-5 bg-white text-center shadow-sm" style="border-radius: 20px;">
+                                <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+                                <p class="text-muted mb-0">No upcoming events are currently scheduled.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+        <section class="testimonial-section">
+            <div class="container-fluid p-0">
+                <div class="text-center mb-5">
+                    <h2 style="font-weight: 800; border: none; color: var(--school-green-dark);">VOICES OF OUR PARENTS</h2>
+                    <div style="width: 80px; height: 5px; background: var(--school-green); margin: 10px auto;"></div>
+                </div>
+                
+                <div class="testimonial-scroller-container">
+                    <div class="testimonial-track">
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "Royal Bees Schools has been a blessing to my family. The transformation I've seen in my children's academic performance and confidence is simply amazing. They truly care about the total child."
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Mrs. Adewale O.</h5>
+                                <small class="text-uppercase text-muted">Parent of JSS3 Student</small>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "The facilities here are second to none. My son loves the coding club and the science laboratory. It's rare to find a school that balances technology with strong moral values so well."
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Engr. Chidi Eze</h5>
+                                <small class="text-uppercase text-muted">Parent of Primary 5 Pupil</small>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "I moved my daughter here last year, and her reading and spoken English have improved drastically. The teachers are so patient and professional. I highly recommend Royal Bees!"
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Alhaja F. Ibrahim</h5>
+                                <small class="text-uppercase text-muted">Parent of Primary 2 Pupil</small>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "What impressed me most is the discipline. They don't just teach academics; they mold the character of the children. My boys are much more responsible at home now."
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Mr. Samuel T.</h5>
+                                <small class="text-uppercase text-muted">Parent of SSS1 Student</small>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "The sports festival and cultural days are always well organized. The school ensures students are physically active and proud of their heritage, not just buried in books all day."
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Mrs. Ojo-Kayode</h5>
+                                <small class="text-uppercase text-muted">Parent of Nursery 2 Pupil</small>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "The management is very responsive. Whenever there is an issue or concern, they handle it swiftly. The communication between the school and parents is excellent."
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Dr. Ayomide A.</h5>
+                                <small class="text-uppercase text-muted">Parent of JSS1 Student</small>
+                            </div>
+                        </div>
+
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "Royal Bees Schools has been a blessing to my family. The transformation I've seen in my children's academic performance and confidence is simply amazing. They truly care about the total child."
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Mrs. Adewale O.</h5>
+                                <small class="text-uppercase text-muted">Parent of JSS3 Student</small>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-item">
+                            <div>
+                                <i class="fas fa-quote-left quote-icon"></i>
+                                <p style="font-style: italic; color: #555; line-height: 1.6;">
+                                    "The facilities here are second to none. My son loves the coding club and the science laboratory. It's rare to find a school that balances technology with strong moral values so well."
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-top">
+                                <h5 class="font-weight-bold mb-0">Engr. Chidi Eze</h5>
+                                <small class="text-uppercase text-muted">Parent of Primary 5 Pupil</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="enroll-cta">
+            <div class="container animate__animated animate__pulse animate__infinite">
+                <h2 class="mb-4">Begin the Journey to Success</h2>
+                <p class="lead mb-5">Join the thousands of families who have trusted Royal Bees Schools for over a decade. Your child deserves the royal treatment in education.</p>
+                <div class="cta-actions">
+                    <a href="{% url 'admissions' %}" class="btn btn-light btn-lg shadow-lg">APPLY FOR ADMISSION</a>
+                    <div class="mt-4">
+                        <p class="mb-0">Need help? Call us on <strong>0803 373 1141</strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div style="height: 20px; background: var(--school-green);"></div>
+
+    </div> 
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                const targetId = link.getAttribute('href').slice(1);
+                const target = targetId ? document.getElementById(targetId) : null;
+                if (target) {
+                    event.preventDefault();
+                    window.scrollTo({
+                        top: target.getBoundingClientRect().top + window.scrollY - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

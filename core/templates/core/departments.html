@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Academic Departments - ROYAL BEES SCHOOLS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-success font-weight-bold">Academic Departments</h1>
+    <hr>
+    <p class="lead text-muted">Our dedicated academic departments are staffed by experienced and passionate educators committed to delivering high-quality instruction and support to our students.</p>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="department-summary shadow-sm" style="margin-bottom: 1.5em; padding: 2em; border: 1px solid #eee; border-top: 5px solid #147a46; border-radius: 15px; background: #fff;">
+                <h2 class="text-success h3">Primary School</h2>
+                <p><strong>Focus:</strong> Foundation and Character Building</p>
+                <p>Our Primary School department focuses on nurturing young minds through a balanced curriculum of literacy, numeracy, and creative arts, ensuring every "Bee" develops a strong foundation for future learning.</p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="department-summary shadow-sm" style="margin-bottom: 1.5em; padding: 2em; border: 1px solid #eee; border-top: 5px solid #0d5c34; border-radius: 15px; background: #fff;">
+                <h2 class="text-success h3">Secondary School</h2>
+                <p><strong>Focus:</strong> Academic Excellence and Leadership</p>
+                <p>In our Secondary School, we prepare students for higher education and global competitiveness, emphasizing science, technology, and leadership skills in a disciplined environment.</p>
+            </div>
+        </div>
+    </div>
+
+    {% if departments %}
+        <h4 class="mt-4 mb-3 text-muted">Specialized Units</h4>
+        {% for dept in departments %}
+            <div class="department-summary" style="margin-bottom: 1.5em; padding: 1em; border: 1px solid #eee; border-radius: 5px;">
+                <h3>{{ dept.name }}</h3>
+                {% if dept.head %}
+                    <p><strong>Head of Department:</strong> {{ dept.head }}</p>
+                {% endif %}
+                {% if dept.description %}
+                    <p>{{ dept.description }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
