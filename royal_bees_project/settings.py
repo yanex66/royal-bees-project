@@ -114,7 +114,6 @@ USE_TZ = True
 
 # --- STATIC FILES ---
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'core', 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # For PythonAnywhere, Whitenoise works best with this setting:
