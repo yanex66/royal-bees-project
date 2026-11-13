@@ -13,6 +13,8 @@ services:
         generateValue: true
       - key: DATABASE_URL
         sync: false
+      - key: CLOUDINARY_URL
+        sync: false
       - key: PAYSTACK_PUBLIC_KEY
         sync: false
       - key: PAYSTACK_SECRET_KEY

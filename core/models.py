@@ -1,4 +1,5 @@
 from django.db import models
+from .storage import get_gallery_storage
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.utils.text import slugify
@@ -134,7 +135,7 @@ class ContactMessage(models.Model):
 
 # --- MODEL FOR GALLERY ---
 class GalleryImage(models.Model):
-    image = models.ImageField(upload_to='gallery/') 
+    image = models.ImageField(upload_to='gallery/', storage=get_gallery_storage)
     caption = models.CharField(max_length=255, blank=True, help_text="Optional description of the photo")
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

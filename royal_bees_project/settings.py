@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
+    'cloudinary_storage',
+    'cloudinary',
     
     'whitenoise.runserver_nostatic', 
     'core',
@@ -124,14 +126,19 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Serve compressed, fingerprinted static files through WhiteNoise.
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
 # --- MEDIA FILES ---
-# Render's local filesystem is not durable; use persistent or external storage for uploads.
+# Use Cloudinary for uploads when configured; local development keeps filesystem storage.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+CLOUDINARY_URL = os.getenv('CLOUDINARY_URL', '').strip()
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 
 # --- PAYSTACK API KEYS ---

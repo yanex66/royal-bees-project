@@ -13,6 +13,7 @@ Configure these values in the Render service dashboard (never commit them):
 - `TEACHER_PORTAL_PASSWORD`: set a long, unique secret. Teacher access stays disabled if it is missing.
 - `PAYSTACK_PUBLIC_KEY` and `PAYSTACK_SECRET_KEY`: configure a matching pair from the same Paystack environment. Test with test keys first; only use live keys after the school explicitly approves real charges.
 - `EMAIL_USER` and `EMAIL_PASSWORD`: configure the mailbox used for admissions, contact messages, and receipts.
+- `CLOUDINARY_URL`: configure the Cloudinary connection URL so uploaded gallery images persist across Render deploys and restarts. Add this as a secret environment variable in Render; do not commit or share it. Without it, gallery uploads use local filesystem storage and will not be available on the production site.
 
 After changing environment variables, redeploy the service.
 
@@ -36,4 +37,5 @@ The fee payment page intentionally stays disabled until it can find a current se
 - Check admissions and contact submissions in admin and verify email delivery.
 - Confirm student results, teacher access, and media uploads with authorized staff.
 - Ensure database backups and persistent media storage are configured. Render's local filesystem is not a permanent store on the free plan.
+- After setting `CLOUDINARY_URL`, re-upload existing gallery images through Django admin. Existing database records only contain media paths; the original files on Render's temporary filesystem are not copied automatically to Cloudinary.
 - Repeat the checks against the public domain after deployment.
