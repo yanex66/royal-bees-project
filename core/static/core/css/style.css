@@ -267,7 +267,7 @@ ul.messages li.error {
 }
 
 .hero-section {
-    background: url("{% static 'core/images/hero_bg.jpg' %}") no-repeat center center / cover;
+    background: url("../images/teampics/schl.jpg") no-repeat center center / cover;
     min-height: 500px; /* Adjust as needed */
     position: relative;
     overflow: hidden;
