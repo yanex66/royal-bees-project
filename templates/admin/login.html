@@ -1,36 +1,105 @@
-{% extends "admin/login.html" %}
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
+    {{ form.media }}
+    <style>
+        .admin-login-brand {
+            margin: 0 0 24px;
+            text-align: center;
+        }
+
+        .admin-login-brand img {
+            display: block;
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            margin: 0 auto 12px;
+        }
+    </style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+    <div class="admin-login-brand">
+        <img src="{% static 'core/images/logos/prlogo.png' %}" alt="Royal Bees International School logo">
+        <h1>Royal Bees Admin</h1>
+    </div>
+
+    {% if form.errors and not form.non_field_errors %}
+        <p class="errornote">
+            {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+        </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <p class="errornote">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <div id="content-main">
+        {% if user.is_authenticated %}
+            <p class="errornote">
+                {% blocktranslate trimmed %}
+                    You are authenticated as {{ username }}, but are not authorized to
+                    access this page. Would you like to login to a different account?
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
+
+        <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+            <div class="form-row">
+                {{ form.username.errors }}
+                {{ form.username.label_tag }} {{ form.username }}
+            </div>
+            <div class="form-row">
+                {{ form.password.errors }}
+                {{ form.password.label_tag }} {{ form.password }}
+                <input type="hidden" name="next" value="{{ next }}">
+            </div>
+            {% url 'admin_password_reset' as password_reset_url %}
+            {% if password_reset_url %}
+                <div class="password-reset-link">
+                    <a href="{{ password_reset_url }}">{% translate 'Forgotten your login credentials?' %}</a>
+                </div>
+            {% endif %}
+            <div class="submit-row">
+                <input type="submit" value="{% translate 'Log in' %}">
+            </div>
+        </form>
+    </div>
+{% endblock %}
 
 {% block footer %}
     {{ block.super }}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // 1. Locate the password input field by its ID
             const passwordField = document.querySelector('#id_password');
-            
-            if (passwordField) {
-                // 2. Create the "Eye" button
-                const toggleBtn = document.createElement('span');
-                toggleBtn.innerHTML = '👁️'; // You can also use an icon class if using FontAwesome
-                toggleBtn.style.cssText = `
-                    position: absolute;
-                    right: 15px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    cursor: pointer;
-                    z-index: 100;
-                    font-size: 1.2rem;
-                `;
-                
-                // 3. Make the parent container relative so the eye stays inside the box
-                const parent = passwordField.parentElement;
-                parent.style.position = 'relative';
-                parent.appendChild(toggleBtn);
 
-                // 4. Add the click logic
+            if (passwordField) {
+                const toggleBtn = document.createElement('button');
+                toggleBtn.type = 'button';
+                toggleBtn.textContent = 'Show';
+                toggleBtn.setAttribute('aria-label', 'Show password');
+                toggleBtn.style.cssText = 'margin-left: 8px; cursor: pointer;';
+
+                passwordField.insertAdjacentElement('afterend', toggleBtn);
                 toggleBtn.addEventListener('click', function () {
-                    const isPassword = passwordField.getAttribute('type') === 'password';
-                    passwordField.setAttribute('type', isPassword ? 'text' : 'password');
-                    this.innerHTML = isPassword ? '🙈' : '👁️';
+                    const showingPassword = passwordField.type === 'password';
+                    passwordField.type = showingPassword ? 'text' : 'password';
+                    toggleBtn.textContent = showingPassword ? 'Hide' : 'Show';
+                    toggleBtn.setAttribute('aria-label', showingPassword ? 'Hide password' : 'Show password');
                 });
             }
         });

@@ -277,6 +277,23 @@
             transform: scale(1.1);
         }
 
+        .footer-admin-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 16px;
+            border: 1px solid var(--cream-light);
+            border-radius: 6px;
+            color: var(--cream-light);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer-admin-link:hover {
+            background-color: var(--cream-light);
+            color: var(--primary-green);
+            text-decoration: none;
+        }
+
         /* --- DJANGO MESSAGES ALERT STYLING (FIXES VS CODE ERRORS) --- */
         .alert-custom { border-radius: 10px; }
         .alert-custom.alert-danger { border-left: 6px solid #dc3545; }
@@ -395,6 +412,7 @@
             </div>
 
             <p>&copy; {% now "Y" %} | Destined to be Leaders</p>
+            <a href="{% url 'admin:index' %}" class="footer-admin-link">Admin Panel</a>
         </div>
     </footer>
 
