@@ -1,34 +1,35 @@
-{% extends "admin/base_site.html" %}
+{% extends "registration/base.html" %}
 {% load i18n static %}
 
-{% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{{ block.super }}{% endblock %}
+{% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}{{ title }} | Royal Bees Admin{% endblock %}
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
-    {{ form.media }}
     <style>
         .admin-login-brand {
-            margin: 0 0 24px;
+            margin: 0 0 20px;
             text-align: center;
         }
 
         .admin-login-brand img {
             display: block;
-            width: 110px;
-            height: 110px;
+            width: 100px;
+            height: 100px;
             object-fit: contain;
-            margin: 0 auto 12px;
+            margin: 0 auto 10px;
+        }
+
+        .admin-login-brand h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .admin-login-password-toggle {
+            white-space: nowrap;
         }
     </style>
 {% endblock %}
-
-{% block bodyclass %}{{ block.super }} login{% endblock %}
-{% block usertools %}{% endblock %}
-{% block nav-global %}{% endblock %}
-{% block nav-sidebar %}{% endblock %}
-{% block content_title %}{% endblock %}
-{% block nav-breadcrumbs %}{% endblock %}
 
 {% block content %}
     <div class="admin-login-brand">
@@ -36,70 +37,72 @@
         <h1>Royal Bees Admin</h1>
     </div>
 
-    {% if form.errors and not form.non_field_errors %}
-        <p class="errornote">
-            {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
-        </p>
-    {% endif %}
+    <p class="login-box-msg">Sign in to manage the school website</p>
 
-    {% if form.non_field_errors %}
-        {% for error in form.non_field_errors %}
-            <p class="errornote">{{ error }}</p>
-        {% endfor %}
-    {% endif %}
-
-    <div id="content-main">
-        {% if user.is_authenticated %}
-            <p class="errornote">
+    {% if user.is_authenticated %}
+        <div class="callout callout-danger">
+            <p>
                 {% blocktranslate trimmed %}
                     You are authenticated as {{ username }}, but are not authorized to
                     access this page. Would you like to login to a different account?
                 {% endblocktranslate %}
             </p>
+        </div>
+    {% endif %}
+
+    {% if form.errors %}
+        <div class="callout callout-danger">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {% for error in form.username.errors %}
+                <p>{{ form.username.label }}: {{ error }}</p>
+            {% endfor %}
+            {% for error in form.password.errors %}
+                <p>{{ form.password.label }}: {{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <input type="text" name="username" id="id_username" class="form-control" placeholder="{{ form.username.label }}" autocomplete="username" required autofocus>
+            <span class="input-group-text"><i class="fas fa-user" aria-hidden="true"></i></span>
+        </div>
+        <div class="input-group mb-3">
+            <input type="password" name="password" id="id_password" class="form-control" placeholder="{{ form.password.label }}" autocomplete="current-password" required>
+            <button type="button" class="input-group-text admin-login-password-toggle" aria-label="Show password" aria-pressed="false">Show</button>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+            <div class="mb-3 text-center">
+                <a href="{{ password_reset_url }}">{% translate 'Forgotten your password or username?' %}</a>
+            </div>
         {% endif %}
 
-        <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
-            <div class="form-row">
-                {{ form.username.errors }}
-                {{ form.username.label_tag }} {{ form.username }}
-            </div>
-            <div class="form-row">
-                {{ form.password.errors }}
-                {{ form.password.label_tag }} {{ form.password }}
-                <input type="hidden" name="next" value="{{ next }}">
-            </div>
-            {% url 'admin_password_reset' as password_reset_url %}
-            {% if password_reset_url %}
-                <div class="password-reset-link">
-                    <a href="{{ password_reset_url }}">{% translate 'Forgotten your login credentials?' %}</a>
-                </div>
-            {% endif %}
-            <div class="submit-row">
-                <input type="submit" value="{% translate 'Log in' %}">
-            </div>
-        </form>
-    </div>
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">{% translate "Log in" %}</button>
+        </div>
+    </form>
 {% endblock %}
 
-{% block footer %}
+{% block extrahead %}
     {{ block.super }}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const passwordField = document.querySelector('#id_password');
+            const toggleButton = document.querySelector('.admin-login-password-toggle');
 
-            if (passwordField) {
-                const toggleBtn = document.createElement('button');
-                toggleBtn.type = 'button';
-                toggleBtn.textContent = 'Show';
-                toggleBtn.setAttribute('aria-label', 'Show password');
-                toggleBtn.style.cssText = 'margin-left: 8px; cursor: pointer;';
-
-                passwordField.insertAdjacentElement('afterend', toggleBtn);
-                toggleBtn.addEventListener('click', function () {
+            if (passwordField && toggleButton) {
+                toggleButton.addEventListener('click', function () {
                     const showingPassword = passwordField.type === 'password';
                     passwordField.type = showingPassword ? 'text' : 'password';
-                    toggleBtn.textContent = showingPassword ? 'Hide' : 'Show';
-                    toggleBtn.setAttribute('aria-label', showingPassword ? 'Hide password' : 'Show password');
+                    toggleButton.textContent = showingPassword ? 'Hide' : 'Show';
+                    toggleButton.setAttribute('aria-label', showingPassword ? 'Hide password' : 'Show password');
+                    toggleButton.setAttribute('aria-pressed', String(showingPassword));
                 });
             }
         });
