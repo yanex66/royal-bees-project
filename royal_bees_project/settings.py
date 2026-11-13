@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     
     'whitenoise.runserver_nostatic', 
     'core',
@@ -147,7 +148,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "Royal Bees Admin",
     "site_header": "Royal Bees",
     "site_brand": "Royal Bees School",
-    "site_logo": "core/images/logos/r_logo.png",
+    "site_logo": "core/images/logos/prlogo.png",
     "welcome_sign": "Royal Bees Management Portal",
     "copyright": "Royal Bees International School",
     "user_avatar": None,

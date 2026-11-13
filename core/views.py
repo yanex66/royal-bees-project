@@ -4,10 +4,23 @@ import secrets
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.http import HttpResponse
 from .models import NewsItem, Event, AdmissionApplication, ContactMessage, GalleryImage
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+
+def robots_txt(request):
+    content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /admin/\n"
+        "Disallow: /teacher-access/\n"
+        "Disallow: /results/check/\n"
+        "Sitemap: https://royalbees.org/sitemap.xml\n"
+    )
+    return HttpResponse(content, content_type='text/plain')
+
 
 # --- Existing Views ---
 def home_view(request):
