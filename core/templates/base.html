@@ -19,7 +19,7 @@
     {# Google Fonts - Added 'Cinzel' for a regal, prestigious school title #}
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;700;800&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    <link rel="icon" href="{% static 'core/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'core/images/logos/prlogo.png' %}" type="image/png">
 
     {% block head_extra %}{% endblock %}
 
@@ -99,7 +99,7 @@
         /* --- UPDATED COVER HEADER --- */
         .main-header {
             background-color: var(--primary-green);
-            background-image: linear-gradient(rgba(20, 122, 70, 0.85), rgba(13, 92, 52, 0.95)), url("{% static 'core/images/students_cover.jpg' %}");
+            background-image: linear-gradient(rgba(20, 122, 70, 0.85), rgba(13, 92, 52, 0.95));
             background-size: cover;
             background-position: center 30%;
             background-repeat: no-repeat;
@@ -291,10 +291,13 @@
         }
 
         @media (max-width: 768px) {
-            .main-header { min-height: 140px; padding: 10px; }
-            .header-side-logo { height: 60px; }
-            .site-title-link a { font-size: 1.2rem; letter-spacing: 1px; }
-            .hamburger { font-size: 1.2rem; top: 10px; right: 10px; }
+            .main-header { min-height: 110px; padding: 10px 8px; }
+            .header-side-logo { height: 48px; }
+            .site-title-link { margin-bottom: 0; }
+            .site-title-link a { font-size: 0.9rem; letter-spacing: 0; }
+            .site-title-link a span { display: block; }
+            .header-center-content { padding: 0 6px; }
+            .hamburger { font-size: 1.1rem; top: 8px; right: 8px; }
         }
     </style>
 </head>
@@ -313,7 +316,7 @@
 
         <div class="header-center-content">
             <h1 class="site-title-link">
-                <a href="{% url 'home' %}">ROYAL BEES INTERNATIONAL SCHOOL</a>
+                <a href="{% url 'home' %}"><span>ROYAL BEES</span> <span>INTERNATIONAL SCHOOL</span></a>
             </h1>
             
             <nav class="desktop-nav">
@@ -352,7 +355,7 @@
         </ul>
     </div>
 
-    <main class="animate__animated animate__fadeInUp">
+    <main class="animate__animated animate__fadeInUp {% block main_class %}{% endblock %}">
         
         {# --- NEW: DJANGO MESSAGES ALERT SYSTEM --- #}
         {% if messages %}

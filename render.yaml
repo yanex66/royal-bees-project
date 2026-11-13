@@ -11,3 +11,15 @@ services:
         value: "False"
       - key: DJANGO_SECRET_KEY
         generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: TEACHER_PORTAL_PASSWORD
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASSWORD
+        sync: false

@@ -1,14 +1,18 @@
-import requests
-import uuid
 import logging
 import json
 import hashlib
 import hmac
+import secrets
+import uuid
+
+import requests
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.forms import modelformset_factory
@@ -92,7 +96,11 @@ def send_payment_receipt(payment):
 
 def initialize_payment(request):
     if request.method == "POST":
-        email = request.POST.get('email')
+        if not settings.PAYSTACK_PUBLIC_KEY or not settings.PAYSTACK_SECRET_KEY:
+            messages.error(request, "Online payments are not configured yet. Please contact the school office.")
+            return redirect('results:pay_fees')
+
+        email = request.POST.get('email', '').strip()
         student_id = request.POST.get('student_id')
         class_id = request.POST.get('student_class')
         term_id = request.POST.get('term')
@@ -100,21 +108,43 @@ def initialize_payment(request):
         if not all([student_id, class_id, term_id, email]):
             messages.error(request, "Please fill in all required fields.")
             return redirect('results:pay_fees')
+        try:
+            validate_email(email)
+            class_id = int(class_id)
+            term_id = int(term_id)
+        except (ValidationError, TypeError, ValueError, OverflowError):
+            messages.error(request, "Please enter a valid email address and select a valid class and term.")
+            return redirect('results:pay_fees')
 
         student = Student.objects.filter(student_id=student_id).first()
         if not student:
             messages.error(request, f"No student found with ID: {student_id}.")
             return redirect('results:pay_fees')
 
+        if not student.active or not student.current_class_id:
+            messages.error(request, "This student is not currently assigned to an active class. Please contact the school office.")
+            return redirect('results:pay_fees')
+
+        if str(student.current_class_id) != str(class_id):
+            messages.error(request, "The selected class does not match the student's current class.")
+            return redirect('results:pay_fees')
+
+        current_session = AcademicSession.objects.filter(is_current=True).first()
         fee_config = ClassFee.objects.filter(
-            class_level_id=class_id, term_id=term_id, session__is_current=True
+            class_level_id=student.current_class_id,
+            term_id=term_id,
+            session=current_session,
         ).first()
         
-        if not fee_config:
+        if not current_session or not fee_config:
             messages.error(request, "Fees for this class/term have not been set.")
             return redirect('results:pay_fees')
         
         current_amount = fee_config.total_amount
+        if current_amount <= 0:
+            messages.error(request, "The fee amount for this class/term is not configured. Please contact the school office.")
+            return redirect('results:pay_fees')
+
         arrears_amount = 0
 
         # Calculate arrears for previous terms in the same session
@@ -131,7 +161,7 @@ def initialize_payment(request):
         total_amount = current_amount + arrears_amount
         reference = str(uuid.uuid4())
 
-        FeePayment.objects.create(
+        payment = FeePayment.objects.create(
             student=student, fee_config=fee_config, amount_paid=total_amount,
             arrears_cleared=arrears_amount, email=email,
             paystack_reference=reference, status='Pending'
@@ -143,18 +173,38 @@ def initialize_payment(request):
                 "callback_url": f"{request.scheme}://{request.get_host()}/results/verify-payment/"}
 
         try:
-            response = requests.post(url, headers=headers, json=data)
+            response = requests.post(url, headers=headers, json=data, timeout=15)
+            response.raise_for_status()
             res_data = response.json()
-            if res_data['status']: return redirect(res_data['data']['authorization_url'])
-            else: messages.error(request, f"Paystack Error: {res_data['message']}")
-        except Exception as e:
-            logger.error(f"Paystack Init Exception: {e}")
+        except (requests.RequestException, ValueError):
+            payment.status = 'Failed'
+            payment.save(update_fields=['status'])
+            logger.exception("Paystack payment initialization failed.")
             messages.error(request, "Connection to Paystack failed.")
-            
+            return redirect('results:pay_fees')
+
+        if res_data.get('status') and res_data.get('data', {}).get('authorization_url'):
+            return redirect(res_data['data']['authorization_url'])
+
+        payment.status = 'Failed'
+        payment.save(update_fields=['status'])
+        messages.error(request, f"Paystack Error: {res_data.get('message', 'Payment could not be initialized.')}")
+
+    current_session = AcademicSession.objects.filter(is_current=True).first()
+    if current_session:
+        classes = ClassLevel.objects.filter(fees__session=current_session).distinct()
+        terms = Term.objects.filter(classfee__session=current_session).distinct()
+    else:
+        classes = ClassLevel.objects.none()
+        terms = Term.objects.none()
+    payments_configured = bool(settings.PAYSTACK_PUBLIC_KEY and settings.PAYSTACK_SECRET_KEY)
+
     context = {
-        'classes': ClassLevel.objects.all(),
-        'terms': Term.objects.all(),
-        'current_session': AcademicSession.objects.filter(is_current=True).first()
+        'classes': classes,
+        'terms': terms,
+        'current_session': current_session,
+        'fee_options_available': classes.exists() and terms.exists(),
+        'payments_configured': payments_configured,
     }
     return render(request, 'results/pay_fees.html', context)
 
@@ -163,28 +213,63 @@ def verify_payment(request):
     if not reference:
         return render(request, 'results/payment_failed.html', {'error': 'No reference provided.'})
 
+    payment = FeePayment.objects.filter(paystack_reference=reference).first()
+    if not payment:
+        return render(
+            request,
+            'results/payment_failed.html',
+            {'error': 'This payment reference could not be found.'},
+            status=404,
+        )
+    if not settings.PAYSTACK_SECRET_KEY:
+        return render(
+            request,
+            'results/payment_failed.html',
+            {'error': 'Payment verification is temporarily unavailable. Please contact the school office.'},
+            status=503,
+        )
+
     url = f"https://api.paystack.co/transaction/verify/{reference}"
     headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}"}
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
         response_data = response.json()
 
-        if response_data['status'] and response_data['data']['status'] == 'success':
-            payment = get_object_or_404(FeePayment, paystack_reference=reference)
-            if payment.status != 'Successful':
-                payment.status = 'Successful'
-                payment.save()
-                send_payment_receipt(payment)
-            return render(request, 'results/payment_success.html', {'payment': payment})
-        else:
-            reason = response_data.get('data', {}).get('gateway_response', 'Unknown Error')
-            return render(request, 'results/payment_failed.html', {'reason': reason})
-    except Exception as e:
-        return render(request, 'results/payment_failed.html', {'error': str(e)})
+    except (requests.RequestException, ValueError):
+        logger.exception("Paystack payment verification failed for reference %s.", reference)
+        return render(
+            request,
+            'results/payment_failed.html',
+            {'error': 'Payment verification could not be completed. Please contact the school office.'},
+            status=502,
+        )
+
+    transaction = response_data.get('data', {})
+    payment_matches = (
+        transaction.get('status') == 'success'
+        and transaction.get('amount') == int(payment.amount_paid * 100)
+        and transaction.get('currency') == 'NGN'
+        and transaction.get('reference') == reference
+    )
+    if response_data.get('status') and payment_matches:
+        if payment.status != 'Successful':
+            payment.status = 'Successful'
+            payment.save(update_fields=['status'])
+            send_payment_receipt(payment)
+        return render(request, 'results/payment_success.html', {'payment': payment})
+
+    reason = transaction.get('gateway_response', 'Payment was not confirmed.')
+    return render(request, 'results/payment_failed.html', {'reason': reason})
 
 @csrf_exempt
 def paystack_webhook(request):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    if not settings.PAYSTACK_SECRET_KEY:
+        return HttpResponse(status=503)
+
     payload = request.body
     signature = request.META.get('HTTP_X_PAYSTACK_SIGNATURE')
     
@@ -197,17 +282,32 @@ def paystack_webhook(request):
         digestmod=hashlib.sha256
     ).hexdigest()
 
-    if computed_hmac != signature:
+    if not secrets.compare_digest(computed_hmac, signature):
         return HttpResponse(status=401)
 
-    data = json.loads(payload)
-    if data['event'] == 'charge.success':
-        reference = data['data']['reference']
+    try:
+        data = json.loads(payload)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return HttpResponse(status=400)
+    if not isinstance(data, dict):
+        return HttpResponse(status=400)
+
+    if data.get('event') == 'charge.success':
+        transaction = data.get('data', {})
+        if not isinstance(transaction, dict):
+            return HttpResponse(status=400)
+        reference = transaction.get('reference')
         payment = FeePayment.objects.filter(paystack_reference=reference).first()
-        
-        if payment and payment.status != 'Successful':
+        payment_matches = (
+            payment
+            and transaction.get('status') == 'success'
+            and transaction.get('amount') == int(payment.amount_paid * 100)
+            and transaction.get('currency') == 'NGN'
+        )
+
+        if payment_matches and payment.status != 'Successful':
             payment.status = 'Successful'
-            payment.save()
+            payment.save(update_fields=['status'])
             send_payment_receipt(payment)
 
     return HttpResponse(status=200)

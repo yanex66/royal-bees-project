@@ -1,5 +1,7 @@
 # royal_bees_project/core/views.py
 
+import secrets
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import NewsItem, Event, AdmissionApplication, ContactMessage, GalleryImage
@@ -191,23 +193,29 @@ def gallery_view(request):
 
 def academic_calendar_view(request):
     context = {
-        'page_title': 'Academic Calendar'
+        'page_title': 'Academic Calendar',
     }
     return render(request, 'core/academic_calendar.html', context)
 
 # --- TEACHER LOCK SCREEN VIEW ---
 def teacher_gate_view(request):
+    portal_password = settings.TEACHER_PORTAL_PASSWORD
     if request.method == 'POST':
         password = request.POST.get('admin_password')
-        if password == 'RoyalBeesAdmin': 
-            request.session['is_teacher'] = True 
+        if not portal_password:
+            messages.error(request, 'Teacher access is not configured. Please contact the school administrator.')
+            return redirect('teacher_gate')
+        if password and secrets.compare_digest(password, portal_password):
+            request.session.cycle_key()
+            request.session['is_teacher'] = True
             messages.success(request, 'Access Granted. Welcome to the Teacher Portal.')
-            return redirect('results:teacher_search_student') 
+            return redirect('results:teacher_search_student')
         else:
             messages.error(request, 'Incorrect Admin Password! Access Denied.')
             return redirect('teacher_gate')
 
     context = {
-        'page_title': 'Teacher Authentication'
+        'page_title': 'Teacher Authentication',
+        'password_configured': bool(portal_password),
     }
     return render(request, 'core/teacher_gate.html', context)

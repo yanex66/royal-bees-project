@@ -5,3 +5,5 @@ whitenoise
 requests
 Pillow
 gunicorn
+dj-database-url>=2.3,<3
+psycopg[binary]>=3.2,<4

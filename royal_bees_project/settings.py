@@ -2,11 +2,12 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from django.core.exceptions import ImproperlyConfigured
+import dj_database_url
 
 # Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load .env file (Make sure you create this file on PythonAnywhere)
+# Load local development settings; production secrets belong in the host environment.
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # --- SECURITY ---
@@ -87,6 +88,12 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+if os.getenv('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.parse(
+        os.environ['DATABASE_URL'],
+        conn_max_age=600,
+        ssl_require=not DEBUG,
+    )
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = not DEBUG
@@ -116,20 +123,20 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# For PythonAnywhere, Whitenoise works best with this setting:
+# Serve compressed, fingerprinted static files through WhiteNoise.
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # --- MEDIA FILES ---
-# GREAT NEWS: On PythonAnywhere, these files are NEVER deleted.
-# You don't need Cloudinary yet!
+# Render's local filesystem is not durable; use persistent or external storage for uploads.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # --- PAYSTACK API KEYS ---
-PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', 'pk_test_placeholder')
-PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY', 'sk_test_placeholder')
+PAYSTACK_PUBLIC_KEY = os.getenv('PAYSTACK_PUBLIC_KEY', '').strip()
+PAYSTACK_SECRET_KEY = os.getenv('PAYSTACK_SECRET_KEY', '').strip()
+TEACHER_PORTAL_PASSWORD = os.getenv('TEACHER_PORTAL_PASSWORD', '')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'

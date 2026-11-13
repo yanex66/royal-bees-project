@@ -3,6 +3,8 @@
 
 {% block title %}Home - ROYAL BEES SCHOOLS{% endblock %}
 
+{% block main_class %}home-main{% endblock %}
+
 {% block head_extra %}
     <link rel="preload" as="image" href="{% static 'core/images/teampics/schl.jpg' %}" fetchpriority="high">
 {% endblock %}
@@ -24,6 +26,18 @@
         .home-wrapper {
             overflow: hidden;
             background-color: var(--white);
+        }
+
+        .home-main {
+            width: 100%;
+            max-width: none;
+            min-height: 0;
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
         }
 
         /* --- Text Carousel Banner --- */
@@ -63,10 +77,9 @@
         }
 
         @keyframes messageRotate {
-            0% { opacity: 0; transform: translateY(20px); }
-            5% { opacity: 1; transform: translateY(0); }
+            0% { opacity: 1; transform: translateY(0); }
             15% { opacity: 1; transform: translateY(0); }
-            20% { opacity: 0; transform: translateY(-20px); }
+            16.666% { opacity: 0; transform: translateY(-20px); }
             100% { opacity: 0; }
         }
 
@@ -359,8 +372,7 @@
         /* --- Call to Action --- */
         .enroll-cta {
             padding: 100px 0;
-            background: linear-gradient(rgba(20, 122, 70, 0.95), rgba(20, 122, 70, 0.95)), 
-                        url("{% static 'core/images/Rimages/cta_bg.jpg' %}") no-repeat center center;
+            background: linear-gradient(135deg, rgba(20, 122, 70, 0.95), rgba(13, 92, 52, 0.98));
             background-size: cover;
             color: var(--white);
             text-align: center;
@@ -419,7 +431,7 @@
         @media (max-width: 576px) {
             .message { font-size: 0.85rem; }
             .hero-section { padding: 60px 0; clip-path: ellipse(200% 100% at 50% 0%); }
-            .hero-section h1 { font-size: 2.2rem; }
+            .hero-section h1 { font-size: clamp(1.8rem, 8vw, 2.2rem); }
             .hero-section .lead { font-size: 1.1rem; padding: 0 10px; margin-bottom: 30px; }
             .quick-links { padding: 50px 0; }
             .quick-links .col-6 { padding: 5px; }
@@ -446,7 +458,7 @@
         <div class="rotating-banner">
             <div class="message-container">
                 <p class="message">Welcome to Royal Bees Schools Official Portal</p>
-                <p class="message">Admission Forms for the 2025/2026 Session are now available</p>
+                <p class="message">Admissions for the 2026/2027 Session are now open</p>
                 <p class="message">Nurturing Today's Child for Tomorrow's Leadership</p>
                 <p class="message">Experience Excellence in Learning and Character</p>
                 <p class="message">Apply Today to Secure Your Child's Bright Future</p>

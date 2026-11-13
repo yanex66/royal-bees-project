@@ -5,18 +5,6 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-7">
-            <!-- Professional Alert Messages Block -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" role="alert">
-                        <i class="fas fa-exclamation-circle mr-2"></i> {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-success text-white text-center py-3">
                     <h4 class="mb-0"><i class="fas fa-university mr-2"></i>School Fee Payment Portal</h4>
@@ -26,6 +14,16 @@
                 </div>
                 <div class="card-body p-4">
                     <p class="text-muted text-center small">Enter Student ID and select Term. Arrears are automatically calculated.</p>
+
+                    {% if not current_session or not fee_options_available %}
+                        <div class="alert alert-warning" role="status">
+                            Fee payment is not available yet because the current academic session or fee schedule has not been configured. Please contact the school office.
+                        </div>
+                    {% elif not payments_configured %}
+                        <div class="alert alert-warning" role="status">
+                            Online payment is temporarily unavailable. Please contact the school office for assistance.
+                        </div>
+                    {% endif %}
                     
                     <form method="POST" action="{% url 'results:pay_fees' %}">
                         {% csrf_token %}
@@ -67,7 +65,7 @@
                             <i class="fas fa-info-circle mr-1"></i> Arrears from unpaid terms in this session will be added automatically.
                         </div>
 
-                        <button type="submit" class="btn btn-success btn-lg btn-block shadow-sm">Proceed to Checkout</button>
+                        <button type="submit" class="btn btn-success btn-lg btn-block shadow-sm" {% if not current_session or not fee_options_available or not payments_configured %}disabled{% endif %}>Proceed to Checkout</button>
                     </form>
                 </div>
                 <div class="card-footer bg-white text-center py-2">
