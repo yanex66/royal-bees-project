@@ -19,7 +19,7 @@ from django.core.mail import send_mail
 from django.forms import modelformset_factory
 
 from .models import (
-    AcademicSession, Term, ClassLevel, ClassFee, 
+    PaymentConfiguration, AcademicSession, Term, ClassLevel, ClassFee,
     Student, Result, Subject, FeePayment, Testimonial
 )
 from .payment_utils import get_fee_balances
@@ -76,7 +76,9 @@ def send_payment_receipt(payment):
 
         Details:
         - Reference: {payment.paystack_reference}
-        - Amount Paid: NGN {payment.amount_paid}
+        - Fee amount: NGN {payment.amount_paid:.2f}
+        - Processing charge: NGN {payment.processing_fee:.2f}
+        - Total charged: NGN {payment.total_transaction_amount:.2f}
         - Term: {payment.fee_config.term.name}
         - Date: {payment.created_at.strftime('%Y-%m-%d %H:%M')}
 
@@ -107,6 +109,7 @@ def initialize_payment(request):
         class_id = request.POST.get('student_class')
         term_id = request.POST.get('term')
         amount_raw = request.POST.get('amount', '').strip()
+        payment_configuration = PaymentConfiguration.objects.get(pk=1)
 
         if not all([student_id, class_id, term_id, email, amount_raw]):
             messages.error(request, "Please fill in all required fields.")
@@ -126,10 +129,14 @@ def initialize_payment(request):
 
         if (
             not amount_to_pay.is_finite()
-            or amount_to_pay < Decimal('1.00')
+            or amount_to_pay < payment_configuration.minimum_payment_amount
             or amount_to_pay != amount_to_pay_cents
         ):
-            messages.error(request, "Enter an amount of at least NGN 1.00 with no more than two decimal places.")
+            messages.error(
+                request,
+                f"Enter an amount of at least NGN {payment_configuration.minimum_payment_amount:.2f} "
+                "with no more than two decimal places.",
+            )
             return redirect('results:pay_fees')
 
         student = Student.objects.filter(student_id=student_id).first()
@@ -186,13 +193,15 @@ def initialize_payment(request):
 
         payment = FeePayment.objects.create(
             student=student, fee_config=fee_config, amount_paid=amount_to_pay,
+            processing_fee=payment_configuration.processing_fee,
             arrears_cleared=arrears_cleared, email=email,
             paystack_reference=reference, status='Pending'
         )
+        total_transaction_amount = payment.total_transaction_amount
 
         url = "https://api.paystack.co/transaction/initialize"
         headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}", "Content-Type": "application/json"}
-        data = {"email": email, "amount": int(amount_to_pay_cents * 100), "reference": reference,
+        data = {"email": email, "amount": int(total_transaction_amount * 100), "reference": reference,
                 "callback_url": f"{request.scheme}://{request.get_host()}/results/verify-payment/"}
 
         try:
@@ -226,6 +235,7 @@ def initialize_payment(request):
         'classes': classes,
         'terms': terms,
         'current_session': current_session,
+        'payment_configuration': PaymentConfiguration.objects.get(pk=1),
         'fee_options_available': classes.exists() and terms.exists(),
         'payments_configured': payments_configured,
     }
@@ -272,7 +282,7 @@ def verify_payment(request):
     transaction = response_data.get('data', {})
     payment_matches = (
         transaction.get('status') == 'success'
-        and transaction.get('amount') == int(payment.amount_paid * 100)
+        and transaction.get('amount') == int(payment.total_transaction_amount * 100)
         and transaction.get('currency') == 'NGN'
         and transaction.get('reference') == reference
     )
@@ -324,7 +334,7 @@ def paystack_webhook(request):
         payment_matches = (
             payment
             and transaction.get('status') == 'success'
-            and transaction.get('amount') == int(payment.amount_paid * 100)
+            and transaction.get('amount') == int(payment.total_transaction_amount * 100)
             and transaction.get('currency') == 'NGN'
         )
 

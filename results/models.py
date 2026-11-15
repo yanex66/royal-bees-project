@@ -1,8 +1,36 @@
+from decimal import Decimal
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator
 
 # --- Academic Structure Models ---
+
+class PaymentConfiguration(models.Model):
+    id = models.PositiveSmallIntegerField(primary_key=True, default=1, editable=False)
+    minimum_payment_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('2000.00'),
+        validators=[MinValueValidator(Decimal('1.00'))],
+        help_text="Minimum amount applied to the student's fee balance.",
+    )
+    processing_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('250.00'),
+        validators=[MinValueValidator(Decimal('0.00'))],
+        help_text="Additional charge added to every new payment.",
+    )
+
+    class Meta:
+        verbose_name = "Payment Configuration"
+        verbose_name_plural = "Payment Configuration"
+
+    def __str__(self):
+        return "School fee payment settings"
+
 
 class AcademicSession(models.Model):
     year = models.CharField(max_length=10, unique=True, help_text="e.g., 2024/2025")
@@ -136,6 +164,11 @@ class FeePayment(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="payments", null=True)
     fee_config = models.ForeignKey(ClassFee, on_delete=models.SET_NULL, null=True)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    processing_fee = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal('0.00'),
+    )
     arrears_cleared = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     email = models.EmailField()
     paystack_reference = models.CharField(max_length=100, unique=True)
@@ -147,6 +180,10 @@ class FeePayment(models.Model):
 
     def __str__(self):
         return f"{self.student.last_name if self.student else 'Unknown'} - {self.amount_paid} ({self.status})"
+
+    @property
+    def total_transaction_amount(self):
+        return self.amount_paid + self.processing_fee
 
 class Testimonial(models.Model):
     """Stores parent reviews as seen in image_acec9f.png"""

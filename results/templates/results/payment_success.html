@@ -7,7 +7,9 @@
     <div style="text-align: left; background: #f9f9f9; padding: 20px; border-radius: 5px;">
         <p><strong>Student:</strong> {{ payment.student.get_full_name }}</p>
         <p><strong>Student ID:</strong> {{ payment.student.student_id }}</p>
-        <p><strong>Amount Paid:</strong> ₦{{ payment.amount_paid|floatformat:2 }}</p>
+        <p><strong>Fee amount:</strong> ₦{{ payment.amount_paid|floatformat:2 }}</p>
+        <p><strong>Processing charge:</strong> ₦{{ payment.processing_fee|floatformat:2 }}</p>
+        <p><strong>Total charged:</strong> ₦{{ payment.total_transaction_amount|floatformat:2 }}</p>
         <p><strong>Fee Term:</strong> {{ payment.fee_config.term.name }} ({{ payment.fee_config.session.year }})</p>
         <p><strong>Reference:</strong> {{ payment.paystack_reference }}</p>
         <p><strong>Date:</strong> {{ payment.created_at|date:"M d, Y H:i" }}</p>

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .payment_utils import get_fee_balances
 from .models import (
-    AcademicSession, Term, ClassLevel, ClassFee, 
+    PaymentConfiguration, AcademicSession, Term, ClassLevel, ClassFee,
     Student, Subject, Result, FeePayment
 )
 
@@ -27,6 +27,18 @@ class ClassFeeInline(admin.TabularInline):
     readonly_fields = ('total_amount',)
 
 # --- ADMIN CLASSES ---
+
+@admin.register(PaymentConfiguration)
+class PaymentConfigurationAdmin(admin.ModelAdmin):
+    fields = ('minimum_payment_amount', 'processing_fee')
+    list_display = ('minimum_payment_amount', 'processing_fee')
+
+    def has_add_permission(self, request):
+        return not PaymentConfiguration.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(AcademicSession)
 class AcademicSessionAdmin(admin.ModelAdmin):
@@ -144,9 +156,13 @@ class ResultAdmin(admin.ModelAdmin):
 
 @admin.register(FeePayment)
 class FeePaymentAdmin(admin.ModelAdmin):
-    list_display = ('student', 'amount_paid', 'status', 'created_at')
+    list_display = ('student', 'amount_paid', 'processing_fee', 'total_transaction_amount', 'status', 'created_at')
     list_filter = ('status', 'fee_config__term')
     search_fields = ('student__last_name', 'paystack_reference')
+
+    @admin.display(description='Total Charged')
+    def total_transaction_amount(self, obj):
+        return obj.total_transaction_amount
     
     def get_readonly_fields(self, request, obj=None):
         return [f.name for f in self.model._meta.fields]

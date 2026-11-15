@@ -1,7 +1,10 @@
+import json
 import hashlib
 import hmac
 from unittest.mock import Mock, patch
 
+from django.contrib.auth.models import User
+from django.core import mail
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -11,12 +14,44 @@ from .models import (
     ClassFee,
     ClassLevel,
     FeePayment,
+    PaymentConfiguration,
     Student,
     Term,
 )
 
 
 class FeePaymentPageTests(TestCase):
+    def test_payment_configuration_is_available_and_editable_in_admin(self):
+        configuration = PaymentConfiguration.objects.get(pk=1)
+        self.assertEqual(configuration.minimum_payment_amount, 2000)
+        self.assertEqual(configuration.processing_fee, 250)
+
+        admin_user = User.objects.create_superuser(
+            username='admin',
+            email='admin@example.com',
+            password='test-password',
+        )
+        self.client.force_login(admin_user)
+        response = self.client.get(
+            reverse('admin:results_paymentconfiguration_change', args=[configuration.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'minimum_payment_amount')
+        self.assertContains(response, 'processing_fee')
+        response = self.client.post(
+            reverse('admin:results_paymentconfiguration_change', args=[configuration.pk]),
+            {
+                'minimum_payment_amount': '2500.00',
+                'processing_fee': '300.00',
+                '_save': 'Save',
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        configuration.refresh_from_db()
+        self.assertEqual(configuration.minimum_payment_amount, 2500)
+        self.assertEqual(configuration.processing_fee, 300)
+
     @override_settings(PAYSTACK_PUBLIC_KEY='', PAYSTACK_SECRET_KEY='')
     def test_payment_page_disables_checkout_without_configuration(self):
         response = self.client.get(reverse('results:pay_fees'))
@@ -50,6 +85,8 @@ class FeePaymentPageTests(TestCase):
         self.assertContains(response, 'Primary 1')
         self.assertContains(response, 'First Term')
         self.assertContains(response, 'name="amount"')
+        self.assertContains(response, 'min="2000.00"')
+        self.assertContains(response, 'NGN 250.00 charge')
         self.assertContains(response, 'aria-label="Paystack"')
         self.assertNotContains(response, 'paystack.com/assets/img/badge.png')
         self.assertNotContains(response, 'current academic session or fee schedule has not been configured')
@@ -103,7 +140,7 @@ class FeePaymentPageTests(TestCase):
             class_level=other_class,
             term=term,
             session=session,
-            tuition_fee=100,
+            tuition_fee=5000,
         )
         Student.objects.create(
             student_id='RBS001',
@@ -119,7 +156,7 @@ class FeePaymentPageTests(TestCase):
                 'student_class': str(other_class.pk),
                 'term': str(term.pk),
                 'email': 'parent@example.com',
-                'amount': '100',
+                'amount': '2000',
             },
             follow=True,
         )
@@ -133,6 +170,7 @@ class FeePaymentPageTests(TestCase):
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
     )
     def test_partial_amount_is_sent_to_paystack_and_applied_to_oldest_balance_first(self):
+        PaymentConfiguration.objects.filter(pk=1).update(minimum_payment_amount=1)
         session = AcademicSession.objects.create(year='2026/2027', is_current=True)
         first_term = Term.objects.create(name='First Term', order=1)
         second_term = Term.objects.create(name='Second Term', order=2)
@@ -191,8 +229,9 @@ class FeePaymentPageTests(TestCase):
             paystack_reference='previous-partial-payment'
         ).get()
         self.assertEqual(payment.amount_paid, 50.25)
+        self.assertEqual(payment.processing_fee, 250)
         self.assertEqual(payment.arrears_cleared, 50.25)
-        self.assertEqual(post.call_args.kwargs['json']['amount'], 5025)
+        self.assertEqual(post.call_args.kwargs['json']['amount'], 30025)
 
         verification_response = Mock()
         verification_response.raise_for_status.return_value = None
@@ -201,7 +240,7 @@ class FeePaymentPageTests(TestCase):
             'data': {
                 'status': 'success',
                 'reference': payment.paystack_reference,
-                'amount': 5025,
+                'amount': 30025,
                 'currency': 'NGN',
             },
         }
@@ -213,6 +252,11 @@ class FeePaymentPageTests(TestCase):
         self.assertEqual(verification.status_code, 200)
         payment.refresh_from_db()
         self.assertEqual(payment.status, 'Successful')
+        self.assertContains(verification, 'Processing charge')
+        self.assertContains(verification, 'Total charged')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Processing charge: NGN 250.00', mail.outbox[0].body)
+        self.assertIn('Total charged: NGN 300.25', mail.outbox[0].body)
 
         with patch('results.views.requests.post') as post:
             response = self.client.post(
@@ -232,7 +276,7 @@ class FeePaymentPageTests(TestCase):
         post.assert_not_called()
 
     @override_settings(PAYSTACK_PUBLIC_KEY='pk_test_example', PAYSTACK_SECRET_KEY='sk_test_example')
-    def test_payment_amount_must_be_within_balance_and_at_least_one_naira(self):
+    def test_payment_amount_must_be_within_balance_and_meet_configured_minimum(self):
         session = AcademicSession.objects.create(year='2026/2027', is_current=True)
         term = Term.objects.create(name='First Term', order=1)
         class_level = ClassLevel.objects.create(name='Primary 1')
@@ -240,7 +284,7 @@ class FeePaymentPageTests(TestCase):
             class_level=class_level,
             term=term,
             session=session,
-            tuition_fee=100,
+            tuition_fee=5000,
         )
         student = Student.objects.create(
             student_id='RBS004',
@@ -256,10 +300,10 @@ class FeePaymentPageTests(TestCase):
         }
 
         invalid_amounts = (
-            ('100.01', 'outstanding balance of NGN 100.00'),
-            ('0.99', 'at least NGN 1.00'),
-            ('1.001', 'at least NGN 1.00'),
-            ('NaN', 'at least NGN 1.00'),
+            ('5000.01', 'outstanding balance of NGN 5000.00'),
+            ('1999.99', 'at least NGN 2000.00'),
+            ('2000.001', 'at least NGN 2000.00'),
+            ('NaN', 'at least NGN 2000.00'),
         )
         with patch('results.views.requests.post') as post:
             for amount, expected_message in invalid_amounts:
@@ -273,6 +317,49 @@ class FeePaymentPageTests(TestCase):
                     self.assertEqual(FeePayment.objects.count(), 0)
                     self.assertContains(response, expected_message)
                     post.assert_not_called()
+
+    @override_settings(PAYSTACK_PUBLIC_KEY='pk_test_example', PAYSTACK_SECRET_KEY='sk_test_example')
+    def test_minimum_fee_payment_adds_configured_charge_to_paystack_amount(self):
+        session = AcademicSession.objects.create(year='2026/2027', is_current=True)
+        term = Term.objects.create(name='First Term', order=1)
+        class_level = ClassLevel.objects.create(name='Primary 1')
+        fee = ClassFee.objects.create(
+            class_level=class_level,
+            term=term,
+            session=session,
+            tuition_fee=3000,
+        )
+        student = Student.objects.create(
+            student_id='RBS006',
+            first_name='Test',
+            last_name='Student',
+            current_class=class_level,
+        )
+        paystack_response = Mock()
+        paystack_response.raise_for_status.return_value = None
+        paystack_response.json.return_value = {
+            'status': True,
+            'data': {'authorization_url': 'https://paystack.test/checkout'},
+        }
+
+        with patch('results.views.requests.post', return_value=paystack_response) as post:
+            response = self.client.post(
+                reverse('results:pay_fees'),
+                {
+                    'student_id': student.student_id,
+                    'student_class': str(class_level.pk),
+                    'term': str(term.pk),
+                    'email': 'parent@example.com',
+                    'amount': '2000.00',
+                },
+            )
+
+        self.assertRedirects(response, 'https://paystack.test/checkout', fetch_redirect_response=False)
+        payment = FeePayment.objects.get()
+        self.assertEqual(payment.amount_paid, 2000)
+        self.assertEqual(payment.processing_fee, 250)
+        self.assertEqual(payment.total_transaction_amount, 2250)
+        self.assertEqual(post.call_args.kwargs['json']['amount'], 225000)
 
     @override_settings(PAYSTACK_PUBLIC_KEY='pk_test_example', PAYSTACK_SECRET_KEY='sk_test_example')
     def test_unknown_payment_reference_is_not_sent_to_paystack(self):
@@ -347,3 +434,59 @@ class FeePaymentPageTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
+
+    @override_settings(
+        PAYSTACK_PUBLIC_KEY='pk_test_example',
+        PAYSTACK_SECRET_KEY='sk_test_example',
+        EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
+    )
+    def test_webhook_verifies_the_saved_fee_and_processing_charge_total(self):
+        session = AcademicSession.objects.create(year='2026/2027', is_current=True)
+        term = Term.objects.create(name='First Term', order=1)
+        class_level = ClassLevel.objects.create(name='Primary 1')
+        fee = ClassFee.objects.create(
+            class_level=class_level,
+            term=term,
+            session=session,
+            tuition_fee=3000,
+        )
+        student = Student.objects.create(
+            student_id='RBS007',
+            first_name='Test',
+            last_name='Student',
+            current_class=class_level,
+        )
+        payment = FeePayment.objects.create(
+            student=student,
+            fee_config=fee,
+            amount_paid=2000,
+            processing_fee=250,
+            email='parent@example.com',
+            paystack_reference='webhook-charge-reference',
+        )
+
+        for amount, expected_status in ((200000, 'Pending'), (225000, 'Successful')):
+            payload = json.dumps({
+                'event': 'charge.success',
+                'data': {
+                    'reference': payment.paystack_reference,
+                    'status': 'success',
+                    'amount': amount,
+                    'currency': 'NGN',
+                },
+            }).encode()
+            signature = hmac.new(
+                b'sk_test_example',
+                payload,
+                digestmod=hashlib.sha256,
+            ).hexdigest()
+            response = self.client.post(
+                reverse('results:paystack_webhook'),
+                data=payload,
+                content_type='application/json',
+                HTTP_X_PAYSTACK_SIGNATURE=signature,
+            )
+
+            self.assertEqual(response.status_code, 200)
+            payment.refresh_from_db()
+            self.assertEqual(payment.status, expected_status)

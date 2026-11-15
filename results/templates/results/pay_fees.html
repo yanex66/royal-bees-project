@@ -57,9 +57,13 @@
                             <label class="font-weight-bold" for="payment-amount">Amount to Pay (NGN)</label>
                             <div class="input-group">
                                 <div class="input-group-prepend"><span class="input-group-text">NGN</span></div>
-                                <input type="number" id="payment-amount" name="amount" class="form-control" min="1.00" step="0.01" inputmode="decimal" placeholder="Enter amount" required>
+                                <input type="number" id="payment-amount" name="amount" class="form-control" min="{{ payment_configuration.minimum_payment_amount }}" step="0.01" inputmode="decimal" placeholder="Enter amount" required>
                             </div>
-                            <small class="form-text text-muted">Minimum NGN 1.00. You can pay part of the balance; payments are applied to the oldest unpaid term first. The amount cannot exceed the outstanding fees for the selected term.</small>
+                            <small class="form-text text-muted">
+                                Minimum fee payment: NGN {{ payment_configuration.minimum_payment_amount|floatformat:2 }}.
+                                An additional NGN {{ payment_configuration.processing_fee|floatformat:2 }} charge is added at checkout.
+                                Partial payments are applied to the oldest unpaid term first, up to the outstanding balance.
+                            </small>
                         </div>
 
                         <div class="mb-4">
