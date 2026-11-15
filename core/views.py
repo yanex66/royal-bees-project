@@ -4,6 +4,7 @@ import secrets
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.db.models import Q
 from django.http import HttpResponse
 from .models import NewsItem, Event, AdmissionApplication, ContactMessage, GalleryImage
 from django.utils import timezone
@@ -25,7 +26,10 @@ def robots_txt(request):
 # --- Existing Views ---
 def home_view(request):
     latest_news = NewsItem.objects.all().order_by('-published_date')[:3]
-    upcoming_events = Event.objects.filter(start_datetime__gte=timezone.now()).order_by('start_datetime')[:3]
+    now = timezone.now()
+    upcoming_events = Event.objects.filter(
+        Q(end_datetime__gte=now) | Q(end_datetime__isnull=True, start_datetime__gte=now)
+    ).order_by('start_datetime')[:3]
 
     context = {
         'latest_news': latest_news,
@@ -93,8 +97,13 @@ def news_detail_view(request, year, month, day, slug):
 
 # --- Event Views ---
 def event_list_view(request):
-    upcoming_events = Event.objects.filter(start_datetime__gte=timezone.now()).order_by('start_datetime')
-    past_events = Event.objects.filter(start_datetime__lt=timezone.now()).order_by('-start_datetime')
+    now = timezone.now()
+    upcoming_events = Event.objects.filter(
+        Q(end_datetime__gte=now) | Q(end_datetime__isnull=True, start_datetime__gte=now)
+    ).order_by('start_datetime')
+    past_events = Event.objects.filter(
+        Q(end_datetime__lt=now) | Q(end_datetime__isnull=True, start_datetime__lt=now)
+    ).order_by('-start_datetime')
 
     context = {
         'upcoming_events': upcoming_events,

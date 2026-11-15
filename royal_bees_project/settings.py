@@ -136,7 +136,7 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': 'royal_bees_project.storage.RoyalBeesStaticFilesStorage',
     },
 }
 

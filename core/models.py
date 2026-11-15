@@ -86,7 +86,9 @@ class Event(models.Model):
 
     @property
     def is_upcoming(self):
-        return self.start_datetime > timezone.now()
+        if self.end_datetime:
+            return self.end_datetime >= timezone.now()
+        return self.start_datetime >= timezone.now()
 
     @property
     def is_past(self):
