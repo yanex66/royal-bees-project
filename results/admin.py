@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from .payment_utils import get_fee_balances
 from .models import (
     AcademicSession, Term, ClassLevel, ClassFee, 
     Student, Subject, Result, FeePayment
@@ -91,25 +92,28 @@ class StudentAdmin(admin.ModelAdmin):
     readonly_fields = ('date_admitted',)
 
     def payment_status(self, obj):
-        """Displays a professional color-coded pill for payment status."""
+        """Displays whether current-session fees are unpaid, partial, or paid."""
         current_session = AcademicSession.objects.filter(is_current=True).first()
-        if not current_session:
+        if not current_session or not obj.current_class_id:
             return "N/A"
-        
-        has_paid = FeePayment.objects.filter(
-            student=obj, 
-            fee_config__session=current_session, 
-            status='Successful'
-        ).exists()
 
-        if has_paid:
-            return format_html(
-                '<span style="background: #28a745; color: white; padding: 3px 12px; border-radius: 12px; font-weight: bold; font-size: 10px;">{}</span>',
-                'PAID'
-            )
+        fee_configs, balances = get_fee_balances(obj, current_session)
+        total_due = sum(config.total_amount for config in fee_configs)
+        if total_due <= 0:
+            return "N/A"
+
+        outstanding = sum(balances.values())
+        if outstanding <= 0:
+            label, color = 'PAID', '#28a745'
+        elif outstanding < total_due:
+            label, color = 'PARTIAL', '#d39e00'
+        else:
+            label, color = 'OWING', '#dc3545'
+
         return format_html(
-            '<span style="background: #dc3545; color: white; padding: 3px 12px; border-radius: 12px; font-weight: bold; font-size: 10px;">{}</span>',
-            'OWING'
+            '<span style="background: {}; color: white; padding: 3px 12px; border-radius: 12px; font-weight: bold; font-size: 10px;">{}</span>',
+            color,
+            label,
         )
     
     payment_status.short_description = 'Payment'

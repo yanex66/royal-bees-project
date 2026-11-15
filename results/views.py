@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import secrets
 import uuid
+from decimal import Decimal, InvalidOperation
 
 import requests
 from django.shortcuts import render, get_object_or_404, redirect
@@ -21,6 +22,7 @@ from .models import (
     AcademicSession, Term, ClassLevel, ClassFee, 
     Student, Result, Subject, FeePayment, Testimonial
 )
+from .payment_utils import get_fee_balances
 
 logger = logging.getLogger(__name__)
 
@@ -101,19 +103,33 @@ def initialize_payment(request):
             return redirect('results:pay_fees')
 
         email = request.POST.get('email', '').strip()
-        student_id = request.POST.get('student_id')
+        student_id = request.POST.get('student_id', '').strip()
         class_id = request.POST.get('student_class')
         term_id = request.POST.get('term')
+        amount_raw = request.POST.get('amount', '').strip()
 
-        if not all([student_id, class_id, term_id, email]):
+        if not all([student_id, class_id, term_id, email, amount_raw]):
             messages.error(request, "Please fill in all required fields.")
             return redirect('results:pay_fees')
         try:
             validate_email(email)
             class_id = int(class_id)
             term_id = int(term_id)
+            amount_to_pay = Decimal(amount_raw)
+            amount_to_pay_cents = amount_to_pay.quantize(Decimal('0.01'))
         except (ValidationError, TypeError, ValueError, OverflowError):
             messages.error(request, "Please enter a valid email address and select a valid class and term.")
+            return redirect('results:pay_fees')
+        except InvalidOperation:
+            messages.error(request, "Please enter a valid payment amount.")
+            return redirect('results:pay_fees')
+
+        if (
+            not amount_to_pay.is_finite()
+            or amount_to_pay < Decimal('1.00')
+            or amount_to_pay != amount_to_pay_cents
+        ):
+            messages.error(request, "Enter an amount of at least NGN 1.00 with no more than two decimal places.")
             return redirect('results:pay_fees')
 
         student = Student.objects.filter(student_id=student_id).first()
@@ -140,36 +156,43 @@ def initialize_payment(request):
             messages.error(request, "Fees for this class/term have not been set.")
             return redirect('results:pay_fees')
         
-        current_amount = fee_config.total_amount
-        if current_amount <= 0:
+        if fee_config.total_amount <= 0:
             messages.error(request, "The fee amount for this class/term is not configured. Please contact the school office.")
             return redirect('results:pay_fees')
 
-        arrears_amount = 0
+        fee_configs, fee_balances = get_fee_balances(
+            student,
+            current_session,
+            through_term_order=fee_config.term.order,
+        )
+        arrears_amount = sum(
+            fee_balances[config.pk]
+            for config in fee_configs
+            if config.term.order < fee_config.term.order
+        )
+        amount_due = sum(fee_balances.values())
+        if amount_due <= 0:
+            messages.error(request, "There is no outstanding balance for the selected term.")
+            return redirect('results:pay_fees')
+        if amount_to_pay > amount_due:
+            messages.error(
+                request,
+                f"The amount cannot exceed the outstanding balance of NGN {amount_due:.2f}.",
+            )
+            return redirect('results:pay_fees')
 
-        # Calculate arrears for previous terms in the same session
-        previous_terms = Term.objects.filter(order__lt=fee_config.term.order).order_by('-order')[:2]
-        for p_term in previous_terms:
-            paid = FeePayment.objects.filter(
-                student=student, fee_config__term=p_term, 
-                fee_config__session=fee_config.session, status='Successful'
-            ).exists()
-            if not paid:
-                p_config = ClassFee.objects.filter(class_level=fee_config.class_level, term=p_term, session=fee_config.session).first()
-                if p_config: arrears_amount += p_config.total_amount
-
-        total_amount = current_amount + arrears_amount
+        arrears_cleared = min(amount_to_pay, arrears_amount)
         reference = str(uuid.uuid4())
 
         payment = FeePayment.objects.create(
-            student=student, fee_config=fee_config, amount_paid=total_amount,
-            arrears_cleared=arrears_amount, email=email,
+            student=student, fee_config=fee_config, amount_paid=amount_to_pay,
+            arrears_cleared=arrears_cleared, email=email,
             paystack_reference=reference, status='Pending'
         )
 
         url = "https://api.paystack.co/transaction/initialize"
         headers = {"Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}", "Content-Type": "application/json"}
-        data = {"email": email, "amount": int(total_amount * 100), "reference": reference,
+        data = {"email": email, "amount": int(amount_to_pay_cents * 100), "reference": reference,
                 "callback_url": f"{request.scheme}://{request.get_host()}/results/verify-payment/"}
 
         try:

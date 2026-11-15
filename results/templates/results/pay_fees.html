@@ -54,6 +54,15 @@
                         </div>
 
                         <div class="mb-4">
+                            <label class="font-weight-bold" for="payment-amount">Amount to Pay (NGN)</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend"><span class="input-group-text">NGN</span></div>
+                                <input type="number" id="payment-amount" name="amount" class="form-control" min="1.00" step="0.01" inputmode="decimal" placeholder="Enter amount" required>
+                            </div>
+                            <small class="form-text text-muted">Minimum NGN 1.00. You can pay part of the balance; payments are applied to the oldest unpaid term first. The amount cannot exceed the outstanding fees for the selected term.</small>
+                        </div>
+
+                        <div class="mb-4">
                             <label class="font-weight-bold">Email</label>
                             <div class="input-group">
                                 <div class="input-group-prepend"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div>
@@ -62,14 +71,15 @@
                         </div>
 
                         <div class="alert alert-warning border-0 shadow-sm mb-4 small">
-                            <i class="fas fa-info-circle mr-1"></i> Arrears from unpaid terms in this session will be added automatically.
+                            <i class="fas fa-info-circle mr-1"></i> Previous unpaid terms are included in the outstanding balance and paid first.
                         </div>
 
                         <button type="submit" class="btn btn-success btn-lg btn-block shadow-sm" {% if not current_session or not fee_options_available or not payments_configured %}disabled{% endif %}>Proceed to Checkout</button>
                     </form>
                 </div>
                 <div class="card-footer bg-white text-center py-2">
-                    <img src="https://paystack.com/assets/img/badge.png" alt="Paystack" height="30">
+                    <span role="img" aria-label="Paystack" style="display: inline-block; color: #00a5df; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.04em;">paystack</span>
+                    <span class="sr-only">Payments securely processed by Paystack.</span>
                 </div>
             </div>
         </div>
